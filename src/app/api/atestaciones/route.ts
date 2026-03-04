@@ -122,7 +122,15 @@ async function fetchFromEASGraphQL(wallet: string, schemaUID: string) {
       timeCreated: number;
       txid: string;
     }>;
-    emitted: typeof this.received;
+    emitted: Array<{
+      id: string;
+      attester: string;
+      recipient: string;
+      schemaId: string;
+      data: string;
+      timeCreated: number;
+      txid: string;
+    }>;
   } | null;
 }
 
@@ -221,7 +229,7 @@ export async function GET(request: NextRequest) {
             })
             .filter(Boolean),
           emitted: easData.emitted
-            .map((att) => {
+            .map((att: { id: string; attester: string; recipient: string; schemaId: string; data: string; timeCreated: number; txid: string }) => {
               const decoded = decodeEvaluationSchema(att.data as `0x${string}`);
               if (!decoded) return null;
               return {

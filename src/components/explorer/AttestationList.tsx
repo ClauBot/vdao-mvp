@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { supabase } from '@/lib/supabase';
-import { INTERACTION_TYPES, type Atestacion, type Rubro } from '@/lib/types';
+import { INTERACTION_TYPES, type Atestacion } from '@/lib/types';
 import {
   ChevronLeft,
   ChevronRight,
@@ -133,7 +133,7 @@ export function AttestationList({ wallet }: Props) {
 
         // Build rubro lookup
         const rubroMap: Record<number, string> = {};
-        (rubrosRes.data || []).forEach((r: Rubro) => {
+        (rubrosRes.data || []).forEach((r: { id: number; nombre: string }) => {
           rubroMap[r.id] = r.nombre;
         });
         setRubros(rubroMap);
