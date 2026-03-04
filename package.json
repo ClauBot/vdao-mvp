@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx scripts/seed-database.ts",
+    "seed": "tsx scripts/seed-rubros.ts && tsx scripts/seed-proximidades.ts && tsx scripts/seed-users.ts && tsx scripts/seed-mock-attestations.ts",
+    "seed:rubros": "tsx scripts/seed-rubros.ts",
+    "seed:proximidades": "tsx scripts/seed-proximidades.ts",
+    "seed:users": "tsx scripts/seed-users.ts",
+    "seed:attestations": "tsx scripts/seed-mock-attestations.ts",
+    "seed:all": "tsx scripts/seed-database.ts",
     "deploy:schemas": "tsx scripts/deploy-schemas.ts",
     "type-check": "tsc --noEmit"
   },

@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { Providers } from '@/components/shared/Providers';
 import { Header } from '@/components/shared/Header';
+import { Footer } from '@/components/shared/Footer';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -16,14 +17,36 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'VDAO — Reputación On-Chain',
+  title: {
+    default: 'VDAO - Reputación Mutua On-Chain',
+    template: '%s | VDAO',
+  },
   description:
-    'Sistema de reputación mutual on-chain. Evalúa y sé evaluado por quienes conoces. Construye tu reputación profesional en la cadena.',
-  keywords: ['reputación', 'blockchain', 'EAS', 'Arbitrum', 'web3', 'attestation'],
+    'Sistema de reputación descentralizado con evaluaciones mutuas. Construye tu reputación profesional on-chain, rubro por rubro. Atestaciones en Arbitrum via EAS.',
+  keywords: [
+    'reputación',
+    'blockchain',
+    'EAS',
+    'Arbitrum',
+    'web3',
+    'attestation',
+    'on-chain',
+    'rubros',
+    'evaluación mutua',
+  ],
+  authors: [{ name: 'VDAO' }],
+  creator: 'VDAO',
   openGraph: {
-    title: 'VDAO',
-    description: 'Sistema de reputación on-chain con evaluaciones mutuas',
+    title: 'VDAO - Reputación Mutua On-Chain',
+    description: 'Sistema de reputación descentralizado con evaluaciones mutuas. Construye tu reputación profesional on-chain.',
     type: 'website',
+    siteName: 'VDAO',
+    locale: 'es_MX',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VDAO - Reputación Mutua On-Chain',
+    description: 'Sistema de reputación descentralizado con evaluaciones mutuas on Arbitrum.',
   },
 };
 
@@ -36,8 +59,11 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-          <Header />
-          <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>

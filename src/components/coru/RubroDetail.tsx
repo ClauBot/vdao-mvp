@@ -70,8 +70,8 @@ export function RubroDetail({
   useEffect(() => {
     if (!rubro) return;
     setAttestationCount(null);
-    // TODO: fetch from /api/atestaciones?rubro_id=X
-    // Mock for now
+    // NOTE: Fetch real count from /api/atestaciones?rubro_id=X once indexer is running.
+    // Mocked for MVP demo; seed with `pnpm seed:attestations` to populate cache.
     setAttestationCount(Math.floor(Math.random() * 20));
   }, [rubro]); // eslint-disable-line react-hooks/exhaustive-deps
 

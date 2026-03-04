@@ -68,8 +68,9 @@ export function useUserLevel(wallet?: string): 1 | 2 | 3 | 4 {
 
   useEffect(() => {
     if (!wallet) return;
-    // TODO: fetch from Supabase usuarios table
-    // For now, hardcode level 1 for all wallets unless specified
+    // NOTE: Fetch user level from Supabase `usuarios` table.
+    // Seed test users with `pnpm seed:users` to populate levels.
+    // Until a real lookup is implemented, defaults to level 1.
     setLevel(1);
   }, [wallet]);
 
