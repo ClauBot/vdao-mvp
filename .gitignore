@@ -41,3 +41,4 @@ coverage/
 # Misc
 *.pdf
 .schema-uids.json
+.env.local

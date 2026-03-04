@@ -1,0 +1,10 @@
+{
+  "chain": "sepolia",
+  "chainId": 11155111,
+  "schemas": {
+    "NEXT_PUBLIC_SCHEMA_EVALUATION_UID": "[object Object]",
+    "NEXT_PUBLIC_SCHEMA_PROXIMITY_UID": "[object Object]",
+    "NEXT_PUBLIC_SCHEMA_VALIDATION_UID": "[object Object]"
+  },
+  "deployedAt": "2026-03-04T21:45:52.694Z"
+}
