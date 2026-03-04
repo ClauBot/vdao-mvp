@@ -9,7 +9,7 @@
 import { createSmartAccountClient } from 'permissionless';
 import { toSimpleSmartAccount } from 'permissionless/accounts';
 import { http, type WalletClient } from 'viem';
-import { arbitrumSepolia } from 'viem/chains';
+import { sepolia } from "viem/chains";;
 import {
   publicClient,
   ENTRYPOINT_V07,
@@ -20,7 +20,7 @@ const SIMPLE_ACCOUNT_FACTORY = '0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985' as c
 const PIMLICO_API_KEY = process.env.NEXT_PUBLIC_PIMLICO_API_KEY || '';
 
 function getPimlicoRpc(): string {
-  return `https://api.pimlico.io/v2/arbitrum-sepolia/rpc?apikey=${PIMLICO_API_KEY}`;
+  return `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}`;
 }
 
 /**
@@ -51,7 +51,7 @@ export async function createGaslessClientFromWalletClient(walletClient: WalletCl
 
   const smartAccountClient = createSmartAccountClient({
     account: smartAccount,
-    chain: arbitrumSepolia,
+    chain: sepolia,
     bundlerTransport: http(pimlicoRpc),
     paymaster: pimlicoClient,
     userOperation: {

@@ -42,7 +42,7 @@ export function Footer() {
 
           {/* Tech badge */}
           <p className="text-xs text-neutral-400 dark:text-neutral-600 text-center sm:text-right">
-            Built on Arbitrum&nbsp;•&nbsp;Powered by EAS&nbsp;•&nbsp;Open Source
+            Built on Sepolia&nbsp;•&nbsp;Powered by EAS&nbsp;•&nbsp;Open Source
           </p>
         </div>
       </div>

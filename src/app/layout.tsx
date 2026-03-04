@@ -22,12 +22,12 @@ export const metadata: Metadata = {
     template: '%s | VDAO',
   },
   description:
-    'Sistema de reputación descentralizado con evaluaciones mutuas. Construye tu reputación profesional on-chain, rubro por rubro. Atestaciones en Arbitrum via EAS.',
+    'Sistema de reputación descentralizado con evaluaciones mutuas. Construye tu reputación profesional on-chain, rubro por rubro. Atestaciones en Sepolia via EAS.',
   keywords: [
     'reputación',
     'blockchain',
     'EAS',
-    'Arbitrum',
+    'Sepolia',
     'web3',
     'attestation',
     'on-chain',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'VDAO - Reputación Mutua On-Chain',
-    description: 'Sistema de reputación descentralizado con evaluaciones mutuas on Arbitrum.',
+    description: 'Sistema de reputación descentralizado con evaluaciones mutuas on Sepolia.',
   },
 };
 

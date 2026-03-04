@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { arbitrumSepolia } from 'wagmi/chains';
+import { sepolia } from "wagmi/chains";;
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wallet, ChevronDown, LogOut, Copy, Check, AlertTriangle } from 'lucide-react';
@@ -15,7 +15,7 @@ function truncateAddress(address: string): string {
  *
  * States:
  * 1. Disconnected → shows "Connect Wallet" button
- * 2. Wrong chain → shows "Switch to Arbitrum Sepolia" button
+ * 2. Wrong chain → shows "Switch to Sepolia" button
  * 3. Connected → shows truncated address with disconnect option
  */
 export function ConnectButton() {
@@ -28,7 +28,7 @@ export function ConnectButton() {
   const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const isWrongChain = isConnected && chain?.id !== arbitrumSepolia.id;
+  const isWrongChain = isConnected && chain?.id !== sepolia.id;
 
   const handleCopyAddress = () => {
     if (address) {
@@ -42,7 +42,7 @@ export function ConnectButton() {
   if (isWrongChain) {
     return (
       <Button
-        onClick={() => switchChain({ chainId: arbitrumSepolia.id })}
+        onClick={() => switchChain({ chainId: sepolia.id })}
         disabled={isSwitching}
         variant="destructive"
         size="sm"
@@ -53,7 +53,7 @@ export function ConnectButton() {
         ) : (
           <AlertTriangle className="h-4 w-4" />
         )}
-        {isSwitching ? 'Switching...' : 'Switch to Arbitrum Sepolia'}
+        {isSwitching ? 'Switching...' : 'Switch to Sepolia'}
       </Button>
     );
   }
@@ -86,7 +86,7 @@ export function ConnectButton() {
                 {/* Chain indicator */}
                 <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-neutral-500 dark:text-neutral-400">
                   <span className="h-2 w-2 rounded-full bg-green-400" />
-                  Arbitrum Sepolia
+                  Sepolia
                 </div>
 
                 <hr className="my-1 border-neutral-200 dark:border-neutral-800" />
@@ -155,7 +155,7 @@ export function ConnectButton() {
               <button
                 key={connector.uid}
                 onClick={() => {
-                  connect({ connector, chainId: arbitrumSepolia.id });
+                  connect({ connector, chainId: sepolia.id });
                   setShowConnectors(false);
                 }}
                 disabled={isConnecting}

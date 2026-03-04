@@ -430,7 +430,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
                 </DialogDescription>
               </div>
               <a
-                href={`https://arbitrum-sepolia.easscan.org/tx/${txHash}`}
+                href={`https://sepolia.easscan.org/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline"

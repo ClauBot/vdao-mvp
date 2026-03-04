@@ -18,7 +18,7 @@ export default function HomePage() {
       <section className="py-20 sm:py-32 text-center space-y-8">
         <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
           <span className="mr-2">🔗</span>
-          Arbitrum Sepolia · EAS · Gasless
+          Sepolia · EAS · Gasless
         </div>
 
         <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 leading-tight">
@@ -85,7 +85,7 @@ export default function HomePage() {
             {
               step: '01',
               title: 'Conectá tu wallet',
-              desc: 'MetaMask, WalletConnect o Coinbase Wallet. Auto-switch a Arbitrum Sepolia.',
+              desc: 'MetaMask, WalletConnect o Coinbase Wallet. Auto-switch a Sepolia testnet.',
             },
             {
               step: '02',
@@ -149,7 +149,7 @@ export default function HomePage() {
           <ul className="space-y-3">
             {[
               'Atestaciones inmutables via EAS (Ethereum Attestation Service)',
-              'Arbitrum Sepolia — L2 de Ethereum, fees ultra bajos',
+              'Sepolia — Testnet de Ethereum',
               'Gas patrocinado via Pimlico Paymaster (ERC-4337)',
               'Datos públicos en Supabase con RLS policies',
               'Código abierto en GitHub',
@@ -165,7 +165,7 @@ export default function HomePage() {
 
       {/* ── Tech footnote ─────────────────────────────────── */}
       <div className="pb-12 text-center text-xs text-neutral-400 dark:text-neutral-600">
-        Next.js 14 · Supabase · EAS · Arbitrum Sepolia · wagmi v2 · Pimlico Paymaster
+        Next.js 14 · Supabase · EAS · Sepolia · wagmi v2 · Pimlico Paymaster
       </div>
     </div>
   );

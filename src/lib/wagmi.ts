@@ -1,47 +1,28 @@
 /**
- * VDAO MVP — Wagmi v2 Configuration
- * Chain: Arbitrum Sepolia (421614)
- * Wallets: MetaMask, WalletConnect, Coinbase Wallet, Injected
+ * wagmi v2 configuration for VDAO MVP
+ * Chain: Sepolia (11155111)
  */
 
 import { createConfig, http } from 'wagmi';
-import { arbitrumSepolia } from 'wagmi/chains';
+import { sepolia } from "wagmi/chains";;
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors';
 
-const walletConnectProjectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'vdao-mvp-placeholder';
-
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'placeholder';
 const rpcUrl =
-  process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc';
+  process.env.NEXT_PUBLIC_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
 
-export const wagmiConfig = createConfig({
-  chains: [arbitrumSepolia],
+export const config = createConfig({
+  chains: [sepolia],
   connectors: [
-    // MetaMask and any other browser extension wallet
-    injected({
-      shimDisconnect: true,
-    }),
-    // WalletConnect v2 (QR code, mobile wallets)
-    walletConnect({
-      projectId: walletConnectProjectId,
-      metadata: {
-        name: 'VDAO',
-        description: 'Sistema de reputación on-chain con evaluaciones mutuas',
-        url: 'https://vdao.xyz',
-        icons: ['https://vdao.xyz/icon.png'],
-      },
-    }),
-    // Coinbase Wallet
-    coinbaseWallet({
-      appName: 'VDAO',
-      appLogoUrl: 'https://vdao.xyz/icon.png',
-    }),
+    injected(),
+    walletConnect({ projectId }),
+    coinbaseWallet({ appName: 'VDAO' }),
   ],
   transports: {
-    [arbitrumSepolia.id]: http(rpcUrl),
+    [sepolia.id]: http(rpcUrl),
   },
+  ssr: true,
 });
 
-// Export the target chain for easy reference
-export const VDAO_CHAIN = arbitrumSepolia;
-export const VDAO_CHAIN_ID = arbitrumSepolia.id; // 421614
+export const VDAO_CHAIN = sepolia;
+export const VDAO_CHAIN_ID = sepolia.id; // 11155111

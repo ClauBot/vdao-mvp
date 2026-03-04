@@ -6,11 +6,11 @@
  * Architecture:
  * - ERC-4337 Account Abstraction via Pimlico
  * - Smart Account: Simple Account (permissionless.js v0.3)
- * - Bundler: Pimlico bundler (Arbitrum Sepolia)
+ * - Bundler: Pimlico bundler (Sepolia)
  * - Paymaster: Pimlico Verifying Paymaster (sponsorship policy)
  *
  * Why Pimlico:
- * ✅ Full support for Arbitrum Sepolia (421614)
+ * ✅ Full support for Sepolia (11155111)
  * ✅ Free testnet sponsorship (no upfront costs)
  * ✅ permissionless.js v0.3 native integration
  * ✅ ERC-4337 v0.7 compliant
@@ -20,7 +20,7 @@
  * vs Alchemy: requires Account Kit + paid plan for some features
  * vs StackUp: less actively maintained, smaller ecosystem
  *
- * Gas estimates (Arbitrum Sepolia):
+ * Gas estimates (Sepolia):
  * - EAS Attestation tx: ~100k–150k gas
  * - At ~0.1 gwei: ~0.00001–0.000015 ETH (~$0.03–0.045 at $3000 ETH)
  * - With Pimlico testnet sponsorship: FREE for users
@@ -32,7 +32,7 @@
  * Setup:
  * 1. Sign up at https://dashboard.pimlico.io
  * 2. Create an app → get API key
- * 3. Create sponsorship policy for Arbitrum Sepolia
+ * 3. Create sponsorship policy for Sepolia
  * 4. Set NEXT_PUBLIC_PIMLICO_API_KEY in .env.local
  */
 
@@ -46,7 +46,7 @@ import {
   type Account,
   type LocalAccount,
 } from 'viem';
-import { arbitrumSepolia } from 'viem/chains';
+import { sepolia } from "viem/chains";;
 import { ARBITRUM_SEPOLIA_RPC } from './contracts';
 
 // ============================================================
@@ -56,7 +56,7 @@ import { ARBITRUM_SEPOLIA_RPC } from './contracts';
 /** ERC-4337 EntryPoint v0.7 address (deterministic, same on all chains) */
 export const ENTRYPOINT_V07 = '0x0000000071727De22E5E9d8BAf0edAc6f37da032' as const;
 
-/** Simple Account Factory on Arbitrum Sepolia */
+/** Simple Account Factory on Sepolia */
 const SIMPLE_ACCOUNT_FACTORY = '0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985' as const;
 
 // ============================================================
@@ -67,7 +67,7 @@ const PIMLICO_API_KEY = process.env.NEXT_PUBLIC_PIMLICO_API_KEY || '';
 
 function getPimlicoRpc() {
   if (!PIMLICO_API_KEY) return '';
-  return `https://api.pimlico.io/v2/arbitrum-sepolia/rpc?apikey=${PIMLICO_API_KEY}`;
+  return `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}`;
 }
 
 /**
@@ -82,9 +82,9 @@ export function isPaymasterAvailable(): boolean {
 // Public Client (read-only)
 // ============================================================
 
-/** Read-only public client for Arbitrum Sepolia */
+/** Read-only public client for Sepolia */
 export const publicClient = createPublicClient({
-  chain: arbitrumSepolia,
+  chain: sepolia,
   transport: http(ARBITRUM_SEPOLIA_RPC),
 });
 
@@ -107,7 +107,7 @@ export function createPimlicoSponsorClient() {
 
   return createPimlicoClient({
     transport: http(rpc),
-    chain: arbitrumSepolia,
+    chain: sepolia,
     entryPoint: {
       address: ENTRYPOINT_V07,
       version: '0.7',
@@ -161,7 +161,7 @@ export async function createGaslessClient(signer: LocalAccount) {
   // Create the smart account client with paymaster middleware
   const smartAccountClient = createSmartAccountClient({
     account: smartAccount,
-    chain: arbitrumSepolia,
+    chain: sepolia,
     bundlerTransport: http(pimlicoRpc),
     paymaster: pimlicoClient,
     userOperation: {
@@ -210,7 +210,7 @@ export async function sendDirectTransaction(
   try {
     const walletClient = createWalletClient({
       account,
-      chain: arbitrumSepolia,
+      chain: sepolia,
       transport: http(ARBITRUM_SEPOLIA_RPC),
     });
 
@@ -246,7 +246,7 @@ Pimlico Paymaster Setup Required
 3. Add to .env.local:
    NEXT_PUBLIC_PIMLICO_API_KEY=pim_your_api_key_here
 4. In Pimlico dashboard, create a Sponsorship Policy:
-   - Chain: Arbitrum Sepolia (421614)
+   - Chain: Sepolia (11155111)
    - Max UserOps per wallet per day: 10
    - Max gas per UserOp: 500,000
 5. Restart the dev server (pnpm dev)

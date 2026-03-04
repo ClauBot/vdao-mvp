@@ -96,7 +96,7 @@ export function AttestationCard({ attestation, rubroNombre, viewMode }: Props) {
 
   const counterpartyLabel = viewMode === 'received' ? 'Evaluado por' : 'Evaluado a';
 
-  const easExplorerUrl = `https://arbitrum-sepolia.easscan.org/attestation/view/${attestation.uid}`;
+  const easExplorerUrl = `https://sepolia.easscan.org/attestation/view/${attestation.uid}`;
   const arbiscanUrl = `https://sepolia.arbiscan.io/address/${counterparty}`;
 
   return (

@@ -9,11 +9,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { createPublicClient, http, decodeAbiParameters } from 'viem';
-import { arbitrumSepolia } from 'viem/chains';
+import { sepolia } from "viem/chains";;
 import { ARBITRUM_SEPOLIA_RPC, EAS_ADDRESS } from '@/lib/contracts';
 
-// ── EAS GraphQL endpoint for Arbitrum Sepolia ────────────────
-const EAS_GRAPHQL_URL = 'https://arbitrum-sepolia.easscan.org/graphql';
+// ── EAS GraphQL endpoint for Sepolia ────────────────
+const EAS_GRAPHQL_URL = 'https://sepolia.easscan.org/graphql';
 
 // ── EAS Schema data decoder ──────────────────────────────────
 function decodeEvaluationSchema(data: `0x${string}`) {
@@ -303,7 +303,7 @@ export async function POST(request: NextRequest) {
     if (!uid) {
       try {
         const client = createPublicClient({
-          chain: arbitrumSepolia,
+          chain: sepolia,
           transport: http(ARBITRUM_SEPOLIA_RPC),
         });
 

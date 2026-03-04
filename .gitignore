@@ -42,3 +42,4 @@ coverage/
 *.pdf
 .schema-uids.json
 .env.local
+.vercel
