@@ -1,8 +1,11 @@
 # VDAO — Reputación Mutua On-Chain
 
-Sistema de reputación descentralizado donde individuos se evalúan mutuamente. Las evaluaciones son **atestaciones inmutables** en Arbitrum vía EAS (Ethereum Attestation Service). Los usuarios **no pagan gas** — las atestaciones son gasless gracias a Pimlico Paymaster.
+Sistema de reputación descentralizado donde individuos se evalúan mutuamente a través de ~140 rubros profesionales/comerciales. Las evaluaciones son **atestaciones inmutables** en Sepolia vía EAS (Ethereum Attestation Service).
 
 > Inspirado en el concepto de **Happy or Not**, pero mutuo: ambas partes de una interacción se evalúan entre sí. Esto hace el sistema resistente a spam.
+
+**Demo:** https://vdao-mvp.vercel.app  
+**Repo:** https://github.com/ClauBot/vdao-mvp
 
 ---
 
@@ -17,9 +20,9 @@ Sistema de reputación descentralizado donde individuos se evalúan mutuamente. 
     ┌──────────┴──────────┐
     │                     │
 ┌───▼────────┐    ┌───────▼──────┐
-│  EAS       │    │  Supabase     │
-│  Arbitrum  │    │  (NUC/Cloud)  │
-│  Sepolia   │    │               │
+│  EAS       │    │  PostgreSQL   │
+│  Sepolia   │    │  (local/cloud)│
+│  L1        │    │               │
 │  Attest.   │    │  Rubros       │
 │  Schemas   │    │  Proximidades │
 │            │    │  Usuarios     │
@@ -30,9 +33,9 @@ Sistema de reputación descentralizado donde individuos se evalúan mutuamente. 
 **Stack:**
 - **Frontend:** Next.js 14 App Router + TypeScript + Tailwind CSS + shadcn/ui
 - **Wallet:** wagmi v2 + viem + WalletConnect
-- **Blockchain:** Arbitrum Sepolia (EAS attestations)
-- **Gas:** Pimlico Paymaster (ERC-4337 / Account Abstraction)
-- **DB:** Supabase (PostgreSQL con RLS)
+- **Blockchain:** Sepolia testnet (EAS attestations)
+- **Gas:** Pimlico Paymaster (ERC-4337 / Account Abstraction) — gasless para usuarios
+- **DB:** PostgreSQL (local con `pg`, compatible con Supabase para producción)
 
 ---
 
@@ -42,15 +45,29 @@ Sistema de reputación descentralizado donde individuos se evalúan mutuamente. 
 - Buscar cualquier dirección ETH (o ENS)
 - Dashboard con atestaciones recibidas / emitidas
 - Resumen de reputación: score promedio, rubros activos, nivel
-- Crear atestación (requiere wallet conectada)
-- Gasless: el usuario firma, nosotros pagamos
+- Crear atestación gasless (el usuario firma, nosotros pagamos gas)
 
 ### Módulo 2 — Visualizador CoRu (`/coru`)
-- Tabla de ~152 rubros organizados como grafo DAG
+- Tabla de ~140 rubros organizados como grafo DAG (múltiples padres permitidos)
+- 14 categorías raíz, 160 relaciones padre-hijo
 - Reorganización por proximidad (click en rubro → tabla reordena por similitud)
 - Vista plana / jerárquica
-- CRUD de rubros (nivel 2 para crear, nivel 4 para validar)
+- CRUD de rubros (nivel 2+ propone, nivel 4 valida)
 - Evaluación de proximidad entre rubros (nivel 1+)
+
+---
+
+## ⛓️ EAS Schemas (Sepolia L1)
+
+| Schema | UID | Explorer |
+|--------|-----|----------|
+| Evaluación Mutua | `0xc6fb97ee...8c09c5` | [Ver](https://sepolia.easscan.org/schema/view/0xc6fb97ee8ff47e6e81db00330937bcfcc1add401a9eca8c3b45149aa2a8c09c5) |
+| Proximidad | `0xd363eb10...bc30df` | [Ver](https://sepolia.easscan.org/schema/view/0xd363eb1054af738797280d7a7c954d2c10d0cbf67ed0f676126971e28cbc30df) |
+| Validación | `0x2b5d3d86...b3e8be` | [Ver](https://sepolia.easscan.org/schema/view/0x2b5d3d86ad720516a52401bc5000a1cf92f080bde9df0820ebecc7077cb3e8be) |
+
+**Contratos EAS (Sepolia):**
+- EAS: `0xC2679fBD37d54388Ce493F1DB75320D236e1815e`
+- Schema Registry: `0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0`
 
 ---
 
@@ -59,245 +76,170 @@ Sistema de reputación descentralizado donde individuos se evalúan mutuamente. 
 ### Prerrequisitos
 - Node.js 18+
 - pnpm (`npm install -g pnpm`)
-- Cuenta en Supabase (o instancia local)
-- Cuenta en WalletConnect Cloud (gratis)
+- PostgreSQL 14+
 
 ### 1. Clonar e instalar
 
 ```bash
-git clone https://github.com/your-org/vdao-mvp
+git clone https://github.com/ClauBot/vdao-mvp.git
 cd vdao-mvp
 pnpm install
 ```
 
-### 2. Variables de entorno
+### 2. Crear base de datos
 
 ```bash
-cp .env.example .env.local
+# Crear DB y usuario
+psql -U postgres -c "CREATE DATABASE vdao_mvp;"
+psql -U postgres -c "CREATE USER vdao WITH PASSWORD 'vdao2026';"
+psql -U postgres -c "ALTER DATABASE vdao_mvp OWNER TO vdao;"
+psql -U postgres -d vdao_mvp -c "GRANT ALL ON SCHEMA public TO vdao;"
+
+# Ejecutar schema (7 tablas + índices + RLS)
+PGPASSWORD=vdao2026 psql -h localhost -U vdao -d vdao_mvp -f database-schema.sql
 ```
 
-Editar `.env.local` con los valores reales (ver sección [Variables de Entorno](#variables-de-entorno)).
-
-### 3. Preparar base de datos
-
-Ejecutar el esquema SQL en Supabase Studio o SQL Editor:
+### 3. Seedear datos
 
 ```bash
-# Copiar y ejecutar en Supabase SQL Editor:
-cat database-schema.sql
+# Inserta 140 rubros + 160 relaciones padre-hijo
+node -e "
+const{Pool}=require('pg');
+const rubros=require('./src/config/rubros-seed.json');
+const pool=new Pool({connectionString:'postgresql://vdao:vdao2026@localhost:5432/vdao_mvp'});
+(async()=>{const c=await pool.connect();await c.query('BEGIN');
+for(const r of rubros){
+  await c.query('INSERT INTO rubros(id,nombre,nombre_en,descripcion,activo) VALUES(\$1,\$2,\$3,\$4,\$5) ON CONFLICT DO NOTHING',[r.id,r.nombre,r.nombre_en,r.descripcion,r.activo!==false]);
+  if(r.padres) for(const p of r.padres) await c.query('INSERT INTO rubro_padres(rubro_id,padre_id) VALUES(\$1,\$2) ON CONFLICT DO NOTHING',[r.id,p]);
+}
+await c.query('COMMIT');c.release();await pool.end();console.log('Done');})();
+"
 ```
 
-### 4. Seed de datos
+### 4. Variables de entorno
+
+Crear `.env.local`:
+
+```env
+DATABASE_URL=postgresql://vdao:vdao2026@localhost:5432/vdao_mvp
+
+NEXT_PUBLIC_EAS_CONTRACT=0xC2679fBD37d54388Ce493F1DB75320D236e1815e
+NEXT_PUBLIC_SCHEMA_EVALUATION_UID=0xc6fb97ee8ff47e6e81db00330937bcfcc1add401a9eca8c3b45149aa2a8c09c5
+NEXT_PUBLIC_SCHEMA_PROXIMITY_UID=0xd363eb1054af738797280d7a7c954d2c10d0cbf67ed0f676126971e28cbc30df
+NEXT_PUBLIC_SCHEMA_VALIDATION_UID=0x2b5d3d86ad720516a52401bc5000a1cf92f080bde9df0820ebecc7077cb3e8be
+NEXT_PUBLIC_CHAIN_ID=11155111
+NEXT_PUBLIC_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
+
+# Legacy Supabase vars (needed for build, can be placeholder)
+NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
+SUPABASE_SERVICE_ROLE_KEY=placeholder
+```
+
+### 5. Correr
 
 ```bash
-# Cargar todo en orden (rubros → proximidades → usuarios → mock attestations)
-pnpm seed
-
-# O por separado:
-pnpm seed:rubros
-pnpm seed:proximidades
-pnpm seed:users
-pnpm seed:attestations
+npx next dev -p 3456
+# → http://localhost:3456
 ```
 
-### 5. Correr en desarrollo
-
+Para servir en red local:
 ```bash
-pnpm dev
-```
-
-Abrir [http://localhost:3000](http://localhost:3000).
-
----
-
-## 🔑 Variables de Entorno
-
-Todas las variables están documentadas en `.env.example`.
-
-| Variable | Requerida | Descripción |
-|----------|-----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | URL del proyecto Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Anon key de Supabase (pública) |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✅ (seed/server) | Service role key (nunca exponer al cliente) |
-| `NEXT_PUBLIC_EAS_CONTRACT` | ✅ | Dirección del contrato EAS en Arbitrum Sepolia |
-| `NEXT_PUBLIC_SCHEMA_EVALUATION_UID` | ✅ | UID del schema de evaluación mutua |
-| `NEXT_PUBLIC_SCHEMA_PROXIMITY_UID` | ✅ | UID del schema de proximidad |
-| `NEXT_PUBLIC_SCHEMA_VALIDATION_UID` | ✅ | UID del schema de validación |
-| `NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC` | ✅ | RPC de Arbitrum Sepolia |
-| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | ✅ | Project ID de WalletConnect Cloud |
-| `NEXT_PUBLIC_PIMLICO_API_KEY` | ✅ | API key de Pimlico (paymaster) |
-| `BUNDLER_RPC_URL` | ✅ | Bundler RPC (Pimlico) |
-| `DEPLOYER_PRIVATE_KEY` | Solo deploy | Private key para registrar schemas EAS |
-
----
-
-## 📋 Scripts disponibles
-
-```bash
-pnpm dev                  # Desarrollo local
-pnpm build                # Build de producción
-pnpm start                # Servidor de producción
-pnpm lint                 # ESLint
-pnpm type-check           # TypeScript check
-
-# Seeds (requieren SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY)
-pnpm seed                 # Ejecuta todos los seeds en orden
-pnpm seed:rubros          # Solo rubros (~152)
-pnpm seed:proximidades    # Solo pares de proximidad
-pnpm seed:users           # 10 usuarios de prueba (niveles 1-4)
-pnpm seed:attestations    # 50 atestaciones mock
-
-# EAS
-pnpm deploy:schemas       # Registra los 3 schemas en EAS (requiere DEPLOYER_PRIVATE_KEY)
+npx next dev -p 3456 -H 0.0.0.0
 ```
 
 ---
 
-## 🗄️ Estructura de Carpetas
+## 📊 Base de Datos
+
+7 tablas PostgreSQL:
+
+| Tabla | Descripción |
+|-------|-------------|
+| `rubros` | 140 rubros profesionales/comerciales |
+| `rubro_padres` | Relaciones DAG (un rubro puede tener múltiples padres) |
+| `proximidades` | Distancia/similitud entre pares de rubros |
+| `usuarios` | Wallets registradas con nivel (1-4) |
+| `atestaciones_cache` | Cache local de atestaciones EAS |
+| `proximidad_atestaciones_cache` | Cache de atestaciones de proximidad |
+| `validacion_rubros_cache` | Cache de validaciones de rubros |
+
+### Categorías raíz (14):
+Tecnología, Artes, Mercadotecnia, Entretenimiento, Servicios Profesionales, Educación, Salud, Construcción e Ingeniería, Comercio, Logística y Transporte, Agricultura y Medio Ambiente, Finanzas y Crypto, Ciencias e Investigación, Gobierno y ONG
+
+---
+
+## 🔑 Decisiones de Diseño
+
+- **Escala 1-4:** Fuerza una posición, evita neutralidad
+- **DAG no árbol:** Rubros pueden tener múltiples padres (ej: Ciencia Cognitiva → Psicología + IA + Ciencias)
+- **Proximidad Jaccard:** `|A∩B| / |A∪B|` + bonos por jerarquía
+- **Niveles 1-4:** Determinan permisos (crear rubros, validar, votar)
+- **Gasless:** Usuarios firman, paymaster paga gas vía ERC-4337
+- **Privacidad NULL en MVP:** Todo público, privacidad en fase 2
+
+---
+
+## 📁 Estructura del Proyecto
 
 ```
-vdao-mvp/
-├── src/
-│   ├── app/
-│   │   ├── page.tsx              # Landing page
-│   │   ├── layout.tsx            # Root layout (Header + Footer)
-│   │   ├── globals.css           # Estilos globales
-│   │   ├── explorer/
-│   │   │   └── page.tsx          # Módulo 1: Wallet Explorer
-│   │   ├── coru/
-│   │   │   └── page.tsx          # Módulo 2: CoRu
-│   │   └── api/
-│   │       ├── rubros/           # CRUD rubros
-│   │       ├── atestaciones/     # Leer/indexar atestaciones
-│   │       └── proximidades/     # Leer/calcular proximidades
-│   ├── components/
-│   │   ├── ui/                   # shadcn/ui primitives
-│   │   ├── explorer/             # Componentes del Explorer
-│   │   ├── coru/                 # Componentes del CoRu
-│   │   └── shared/               # Header, Footer, ConnectButton
-│   ├── lib/
-│   │   ├── supabase.ts           # Cliente Supabase
-│   │   ├── eas.ts                # EAS SDK config
-│   │   ├── wagmi.ts              # wagmi config
-│   │   ├── contracts.ts          # ABIs y addresses
-│   │   ├── proximity.ts          # Lógica Jaccard
-│   │   ├── types.ts              # TypeScript types
-│   │   └── utils.ts              # cn() y utilidades
-│   ├── hooks/
-│   │   └── useRubros.ts          # Hook para fetching de rubros
-│   └── config/
-│       ├── rubros-seed.json      # ~152 rubros iniciales
-│       └── proximidades-seed.json # Proximidades propuestas
-├── scripts/
-│   ├── deploy-schemas.ts         # Registrar schemas EAS
-│   ├── seed-database.ts          # Seed completo (legacy)
-│   ├── seed-rubros.ts            # Seed: rubros
-│   ├── seed-proximidades.ts      # Seed: proximidades
-│   ├── seed-mock-attestations.ts # Seed: 50 mock attestations
-│   └── seed-users.ts             # Seed: 10 test users
-├── database-schema.sql           # DDL de la base de datos
-├── .env.example                  # Variables de entorno documentadas
-└── PLAN-DE-TRABAJO.md            # Plan técnico completo del MVP
+src/
+├── app/
+│   ├── page.tsx              # Landing page
+│   ├── layout.tsx            # Root layout + providers
+│   ├── explorer/page.tsx     # Wallet Explorer
+│   ├── coru/page.tsx         # CoRu Visualizer
+│   └── api/
+│       ├── rubros/           # CRUD rubros
+│       ├── proximidades/     # Proximidades
+│       ├── atestaciones/     # Atestaciones EAS
+│       └── usuarios/         # Usuarios
+├── components/
+│   ├── explorer/             # AttestationList, Card, Create, Summary
+│   ├── coru/                 # RubrosTable, ProximityEvaluator, CRUD
+│   └── shared/               # Header, Footer, ConnectButton, Providers
+├── config/
+│   └── rubros-seed.json      # 140 rubros con padres
+├── lib/
+│   ├── db.ts                 # PostgreSQL pool (pg)
+│   ├── wagmi.ts              # wagmi v2 config (Sepolia)
+│   ├── eas.ts                # EAS SDK helpers
+│   ├── paymaster.ts          # Pimlico paymaster (server)
+│   └── paymaster-browser.ts  # Pimlico paymaster (client)
+└── scripts/
+    ├── deploy-schemas-sepolia.ts  # Deploy EAS schemas
+    ├── seed-rubros.ts
+    ├── seed-proximidades.ts
+    └── seed-mock-attestations.ts
 ```
 
 ---
 
-## 🔗 Contratos / Direcciones
+## 🛣️ Roadmap
 
-| Recurso | Red | Dirección / UID |
-|---------|-----|-----------------|
-| EAS Contract | Arbitrum Sepolia | `0xaEF4103A04090071165F78D45D83A0C0782c2B2a` |
-| Schema Registry | Arbitrum Sepolia | `0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0` |
-| Schema: Evaluación | Arbitrum Sepolia | Ver `NEXT_PUBLIC_SCHEMA_EVALUATION_UID` |
-| Schema: Proximidad | Arbitrum Sepolia | Ver `NEXT_PUBLIC_SCHEMA_PROXIMITY_UID` |
-| Schema: Validación | Arbitrum Sepolia | Ver `NEXT_PUBLIC_SCHEMA_VALIDATION_UID` |
-
----
-
-## 📐 Schemas EAS
-
-### Schema 1 — Evaluación Mutua
-```
-address attester          // Quien evalúa
-address receiver          // Quien recibe
-uint16 rubroId            // Rubro de la interacción
-uint8 interactionType     // 0=Comercial, 1=Docente, 2=Investigación
-uint8 scoreService        // 1-4 (Muy malo → Muy bueno)
-uint8 scoreTreatment      // 1-4 (Muy malo → Muy bueno)
-uint8 role                // 0=Proveedor, 1=Cliente
-bytes32 counterpartAttestation  // UID de la atestación de la contraparte
-```
-
-### Schema 2 — Proximidad de Rubros
-```
-uint16 rubroA             // Primer rubro
-uint16 rubroB             // Segundo rubro
-uint8 proximityScore      // 1-100
-uint8 proposerLevel       // Nivel del proponente (afecta peso)
-```
-
-### Schema 3 — Validación de Rubro
-```
-uint16 rubroId            // ID del rubro propuesto
-bool approved             // Aprobado o rechazado
-string reason             // Razón (opcional)
-```
+- [x] Fase 0: Diseño de datos (rubros, proximidades, schemas)
+- [x] Fase 1: Infraestructura (Next.js + DB + EAS + Wallet)
+- [x] Fase 2: Wallet Explorer
+- [x] Fase 3: CoRu Visualizer
+- [x] Fase 4: Integración y polish
+- [x] EAS Schemas desplegados en Sepolia
+- [x] Deploy Vercel (demo)
+- [ ] Paymaster funcional (Pimlico)
+- [ ] Mobile-first UI
+- [ ] CAPTCHA anti-sybil (fase 2)
+- [ ] Migración a mainnet
 
 ---
 
-## 🚢 Deploy a Vercel
+## 👥 Créditos
 
-```bash
-# 1. Push a GitHub
-git push origin main
-
-# 2. Importar en Vercel
-# https://vercel.com/new → Import Git Repository
-
-# 3. Configurar variables de entorno en Vercel Dashboard
-# (mismas que en .env.local, excepto las que comienzan con NEXT_PUBLIC_ se pueden ver)
-
-# 4. Deploy automático en cada push a main
-```
-
-**Notas de deploy:**
-- Framework: Next.js (auto-detectado)
-- Build command: `pnpm build`
-- Output dir: `.next`
-- Asegurarse de que `SUPABASE_SERVICE_ROLE_KEY` esté en las env vars de Vercel (no expuesta al cliente)
+- **Diseño del sistema:** SOXAvisual
+- **Desarrollo:** ClauBot (AI-assisted)
+- **Concepto:** mexi / BandaWeb3
 
 ---
 
-## 🧩 Niveles de Usuario
+## 📄 Licencia
 
-| Nivel | Nombre | Permisos |
-|-------|--------|----------|
-| 1 | Participante | Conectar wallet, ser evaluado, buscar wallets |
-| 2 | Proponente | + Proponer nuevos rubros |
-| 3 | Evaluador | + Emitir atestaciones, evaluar proximidades |
-| 4 | Validador | + Aprobar/rechazar propuestas de rubros (gobernanza) |
-
----
-
-## 📖 Documentación adicional
-
-- [`PLAN-DE-TRABAJO.md`](./PLAN-DE-TRABAJO.md) — Plan técnico completo del MVP
-- [`database-schema.sql`](./database-schema.sql) — DDL de la base de datos
-- [`src/config/rubros-seed.json`](./src/config/rubros-seed.json) — Datos de rubros
-- [`src/config/proximidades-seed.json`](./src/config/proximidades-seed.json) — Proximidades iniciales
-
----
-
-## ⚠️ Fuera de Alcance (MVP)
-
-- Privacidad / ZK-proofs
-- SBTs personalizables
-- Sistema de disputas
-- Multi-idioma
-- App móvil nativa
-- Paymaster avanzado (Account Abstraction completo)
-
----
-
-*VDAO MVP — Marzo 2026*  
-*Built on Arbitrum • Powered by EAS • Open Source*
+MIT
