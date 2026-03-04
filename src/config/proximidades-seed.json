@@ -1,0 +1,870 @@
+[
+  {
+    "rubro_a": 2,
+    "rubro_b": 3,
+    "valor_propuesto": 0.8,
+    "codigo_a": "T01",
+    "codigo_b": "T02"
+  },
+  {
+    "rubro_a": 2,
+    "rubro_b": 6,
+    "valor_propuesto": 0.75,
+    "codigo_a": "T01",
+    "codigo_b": "T05"
+  },
+  {
+    "rubro_a": 2,
+    "rubro_b": 7,
+    "valor_propuesto": 0.65,
+    "codigo_a": "T01",
+    "codigo_b": "T06"
+  },
+  {
+    "rubro_a": 2,
+    "rubro_b": 19,
+    "valor_propuesto": 0.75,
+    "codigo_a": "T01",
+    "codigo_b": "T18"
+  },
+  {
+    "rubro_a": 2,
+    "rubro_b": 20,
+    "valor_propuesto": 0.7,
+    "codigo_a": "T01",
+    "codigo_b": "T19"
+  },
+  {
+    "rubro_a": 2,
+    "rubro_b": 51,
+    "valor_propuesto": 0.5,
+    "codigo_a": "T01",
+    "codigo_b": "EN02"
+  },
+  {
+    "rubro_a": 2,
+    "rubro_b": 84,
+    "valor_propuesto": 0.1,
+    "codigo_a": "T01",
+    "codigo_b": "SA01"
+  },
+  {
+    "rubro_a": 2,
+    "rubro_b": 93,
+    "valor_propuesto": 0.1,
+    "codigo_a": "T01",
+    "codigo_b": "CO01"
+  },
+  {
+    "rubro_a": 3,
+    "rubro_b": 4,
+    "valor_propuesto": 0.85,
+    "codigo_a": "T02",
+    "codigo_b": "T03"
+  },
+  {
+    "rubro_a": 3,
+    "rubro_b": 5,
+    "valor_propuesto": 0.85,
+    "codigo_a": "T02",
+    "codigo_b": "T04"
+  },
+  {
+    "rubro_a": 3,
+    "rubro_b": 6,
+    "valor_propuesto": 0.55,
+    "codigo_a": "T02",
+    "codigo_b": "T05"
+  },
+  {
+    "rubro_a": 3,
+    "rubro_b": 15,
+    "valor_propuesto": 0.55,
+    "codigo_a": "T02",
+    "codigo_b": "T14"
+  },
+  {
+    "rubro_a": 3,
+    "rubro_b": 76,
+    "valor_propuesto": 0.4,
+    "codigo_a": "T02",
+    "codigo_b": "ED02"
+  },
+  {
+    "rubro_a": 3,
+    "rubro_b": 102,
+    "valor_propuesto": 0.5,
+    "codigo_a": "T02",
+    "codigo_b": "CM01"
+  },
+  {
+    "rubro_a": 4,
+    "rubro_b": 5,
+    "valor_propuesto": 0.7,
+    "codigo_a": "T03",
+    "codigo_b": "T04"
+  },
+  {
+    "rubro_a": 4,
+    "rubro_b": 25,
+    "valor_propuesto": 0.45,
+    "codigo_a": "T03",
+    "codigo_b": "A04"
+  },
+  {
+    "rubro_a": 5,
+    "rubro_b": 19,
+    "valor_propuesto": 0.6,
+    "codigo_a": "T04",
+    "codigo_b": "T18"
+  },
+  {
+    "rubro_a": 5,
+    "rubro_b": 32,
+    "valor_propuesto": 0.02,
+    "codigo_a": "T04",
+    "codigo_b": "A11"
+  },
+  {
+    "rubro_a": 7,
+    "rubro_b": 8,
+    "valor_propuesto": 0.45,
+    "codigo_a": "T06",
+    "codigo_b": "T07"
+  },
+  {
+    "rubro_a": 7,
+    "rubro_b": 14,
+    "valor_propuesto": 0.4,
+    "codigo_a": "T06",
+    "codigo_b": "T13"
+  },
+  {
+    "rubro_a": 8,
+    "rubro_b": 11,
+    "valor_propuesto": 0.4,
+    "codigo_a": "T07",
+    "codigo_b": "T10"
+  },
+  {
+    "rubro_a": 8,
+    "rubro_b": 13,
+    "valor_propuesto": 0.5,
+    "codigo_a": "T07",
+    "codigo_b": "T12"
+  },
+  {
+    "rubro_a": 8,
+    "rubro_b": 63,
+    "valor_propuesto": 0.35,
+    "codigo_a": "T07",
+    "codigo_b": "SP02"
+  },
+  {
+    "rubro_a": 9,
+    "rubro_b": 10,
+    "valor_propuesto": 0.8,
+    "codigo_a": "T08",
+    "codigo_b": "T09"
+  },
+  {
+    "rubro_a": 9,
+    "rubro_b": 18,
+    "valor_propuesto": 0.4,
+    "codigo_a": "T08",
+    "codigo_b": "T17"
+  },
+  {
+    "rubro_a": 9,
+    "rubro_b": 34,
+    "valor_propuesto": 0.05,
+    "codigo_a": "T08",
+    "codigo_b": "A13"
+  },
+  {
+    "rubro_a": 9,
+    "rubro_b": 133,
+    "valor_propuesto": 0.55,
+    "codigo_a": "T08",
+    "codigo_b": "CI03"
+  },
+  {
+    "rubro_a": 11,
+    "rubro_b": 12,
+    "valor_propuesto": 0.85,
+    "codigo_a": "T10",
+    "codigo_b": "T11"
+  },
+  {
+    "rubro_a": 11,
+    "rubro_b": 30,
+    "valor_propuesto": 0.4,
+    "codigo_a": "T10",
+    "codigo_b": "A09"
+  },
+  {
+    "rubro_a": 11,
+    "rubro_b": 89,
+    "valor_propuesto": 0.02,
+    "codigo_a": "T10",
+    "codigo_b": "SA06"
+  },
+  {
+    "rubro_a": 11,
+    "rubro_b": 90,
+    "valor_propuesto": 0.02,
+    "codigo_a": "T10",
+    "codigo_b": "SA07"
+  },
+  {
+    "rubro_a": 11,
+    "rubro_b": 125,
+    "valor_propuesto": 0.75,
+    "codigo_a": "T10",
+    "codigo_b": "FI03"
+  },
+  {
+    "rubro_a": 11,
+    "rubro_b": 127,
+    "valor_propuesto": 0.7,
+    "codigo_a": "T10",
+    "codigo_b": "FI05"
+  },
+  {
+    "rubro_a": 12,
+    "rubro_b": 82,
+    "valor_propuesto": 0.05,
+    "codigo_a": "T11",
+    "codigo_b": "ED08"
+  },
+  {
+    "rubro_a": 13,
+    "rubro_b": 17,
+    "valor_propuesto": 0.55,
+    "codigo_a": "T12",
+    "codigo_b": "T16"
+  },
+  {
+    "rubro_a": 15,
+    "rubro_b": 25,
+    "valor_propuesto": 0.7,
+    "codigo_a": "T14",
+    "codigo_b": "A04"
+  },
+  {
+    "rubro_a": 15,
+    "rubro_b": 37,
+    "valor_propuesto": 0.45,
+    "codigo_a": "T14",
+    "codigo_b": "M01"
+  },
+  {
+    "rubro_a": 16,
+    "rubro_b": 17,
+    "valor_propuesto": 0.5,
+    "codigo_a": "T15",
+    "codigo_b": "T16"
+  },
+  {
+    "rubro_a": 16,
+    "rubro_b": 96,
+    "valor_propuesto": 0.5,
+    "codigo_a": "T15",
+    "codigo_b": "CO04"
+  },
+  {
+    "rubro_a": 21,
+    "rubro_b": 22,
+    "valor_propuesto": 0.75,
+    "codigo_a": "A00",
+    "codigo_b": "A01"
+  },
+  {
+    "rubro_a": 22,
+    "rubro_b": 98,
+    "valor_propuesto": 0.02,
+    "codigo_a": "A01",
+    "codigo_b": "CO06"
+  },
+  {
+    "rubro_a": 23,
+    "rubro_b": 28,
+    "valor_propuesto": 0.5,
+    "codigo_a": "A02",
+    "codigo_b": "A07"
+  },
+  {
+    "rubro_a": 23,
+    "rubro_b": 36,
+    "valor_propuesto": 0.4,
+    "codigo_a": "A02",
+    "codigo_b": "M00"
+  },
+  {
+    "rubro_a": 24,
+    "rubro_b": 25,
+    "valor_propuesto": 0.55,
+    "codigo_a": "A03",
+    "codigo_b": "A04"
+  },
+  {
+    "rubro_a": 24,
+    "rubro_b": 29,
+    "valor_propuesto": 0.5,
+    "codigo_a": "A03",
+    "codigo_b": "A08"
+  },
+  {
+    "rubro_a": 25,
+    "rubro_b": 35,
+    "valor_propuesto": 0.4,
+    "codigo_a": "A04",
+    "codigo_b": "A14"
+  },
+  {
+    "rubro_a": 25,
+    "rubro_b": 41,
+    "valor_propuesto": 0.75,
+    "codigo_a": "A04",
+    "codigo_b": "M05"
+  },
+  {
+    "rubro_a": 26,
+    "rubro_b": 27,
+    "valor_propuesto": 0.85,
+    "codigo_a": "A05",
+    "codigo_b": "A06"
+  },
+  {
+    "rubro_a": 26,
+    "rubro_b": 56,
+    "valor_propuesto": 0.6,
+    "codigo_a": "A05",
+    "codigo_b": "EN07"
+  },
+  {
+    "rubro_a": 26,
+    "rubro_b": 64,
+    "valor_propuesto": 0.05,
+    "codigo_a": "A05",
+    "codigo_b": "SP03"
+  },
+  {
+    "rubro_a": 26,
+    "rubro_b": 100,
+    "valor_propuesto": 0.01,
+    "codigo_a": "A05",
+    "codigo_b": "CO08"
+  },
+  {
+    "rubro_a": 28,
+    "rubro_b": 29,
+    "valor_propuesto": 0.5,
+    "codigo_a": "A07",
+    "codigo_b": "A08"
+  },
+  {
+    "rubro_a": 28,
+    "rubro_b": 42,
+    "valor_propuesto": 0.4,
+    "codigo_a": "A07",
+    "codigo_b": "M06"
+  },
+  {
+    "rubro_a": 28,
+    "rubro_b": 55,
+    "valor_propuesto": 0.8,
+    "codigo_a": "A07",
+    "codigo_b": "EN06"
+  },
+  {
+    "rubro_a": 29,
+    "rubro_b": 51,
+    "valor_propuesto": 0.55,
+    "codigo_a": "A08",
+    "codigo_b": "EN02"
+  },
+  {
+    "rubro_a": 31,
+    "rubro_b": 57,
+    "valor_propuesto": 0.55,
+    "codigo_a": "A10",
+    "codigo_b": "EN08"
+  },
+  {
+    "rubro_a": 32,
+    "rubro_b": 63,
+    "valor_propuesto": 0.05,
+    "codigo_a": "A11",
+    "codigo_b": "SP02"
+  },
+  {
+    "rubro_a": 33,
+    "rubro_b": 40,
+    "valor_propuesto": 0.4,
+    "codigo_a": "A12",
+    "codigo_b": "M04"
+  },
+  {
+    "rubro_a": 33,
+    "rubro_b": 45,
+    "valor_propuesto": 0.5,
+    "codigo_a": "A12",
+    "codigo_b": "M09"
+  },
+  {
+    "rubro_a": 34,
+    "rubro_b": 64,
+    "valor_propuesto": 0.1,
+    "codigo_a": "A13",
+    "codigo_b": "SP03"
+  },
+  {
+    "rubro_a": 36,
+    "rubro_b": 37,
+    "valor_propuesto": 0.8,
+    "codigo_a": "M00",
+    "codigo_b": "M01"
+  },
+  {
+    "rubro_a": 36,
+    "rubro_b": 50,
+    "valor_propuesto": 0.45,
+    "codigo_a": "M00",
+    "codigo_b": "EN01"
+  },
+  {
+    "rubro_a": 36,
+    "rubro_b": 59,
+    "valor_propuesto": 0.35,
+    "codigo_a": "M00",
+    "codigo_b": "EN10"
+  },
+  {
+    "rubro_a": 36,
+    "rubro_b": 62,
+    "valor_propuesto": 0.4,
+    "codigo_a": "M00",
+    "codigo_b": "SP01"
+  },
+  {
+    "rubro_a": 36,
+    "rubro_b": 98,
+    "valor_propuesto": 0.1,
+    "codigo_a": "M00",
+    "codigo_b": "CO06"
+  },
+  {
+    "rubro_a": 37,
+    "rubro_b": 38,
+    "valor_propuesto": 0.8,
+    "codigo_a": "M01",
+    "codigo_b": "M02"
+  },
+  {
+    "rubro_a": 37,
+    "rubro_b": 39,
+    "valor_propuesto": 0.7,
+    "codigo_a": "M01",
+    "codigo_b": "M03"
+  },
+  {
+    "rubro_a": 37,
+    "rubro_b": 44,
+    "valor_propuesto": 0.75,
+    "codigo_a": "M01",
+    "codigo_b": "M08"
+  },
+  {
+    "rubro_a": 37,
+    "rubro_b": 102,
+    "valor_propuesto": 0.5,
+    "codigo_a": "M01",
+    "codigo_b": "CM01"
+  },
+  {
+    "rubro_a": 38,
+    "rubro_b": 48,
+    "valor_propuesto": 0.75,
+    "codigo_a": "M02",
+    "codigo_b": "M12"
+  },
+  {
+    "rubro_a": 38,
+    "rubro_b": 54,
+    "valor_propuesto": 0.45,
+    "codigo_a": "M02",
+    "codigo_b": "EN05"
+  },
+  {
+    "rubro_a": 42,
+    "rubro_b": 43,
+    "valor_propuesto": 0.5,
+    "codigo_a": "M06",
+    "codigo_b": "M07"
+  },
+  {
+    "rubro_a": 46,
+    "rubro_b": 132,
+    "valor_propuesto": 0.45,
+    "codigo_a": "M10",
+    "codigo_b": "CI02"
+  },
+  {
+    "rubro_a": 50,
+    "rubro_b": 110,
+    "valor_propuesto": 0.4,
+    "codigo_a": "EN01",
+    "codigo_b": "LO00"
+  },
+  {
+    "rubro_a": 51,
+    "rubro_b": 52,
+    "valor_propuesto": 0.85,
+    "codigo_a": "EN02",
+    "codigo_b": "EN03"
+  },
+  {
+    "rubro_a": 51,
+    "rubro_b": 53,
+    "valor_propuesto": 0.65,
+    "codigo_a": "EN02",
+    "codigo_b": "EN04"
+  },
+  {
+    "rubro_a": 53,
+    "rubro_b": 89,
+    "valor_propuesto": 0.02,
+    "codigo_a": "EN04",
+    "codigo_b": "SA06"
+  },
+  {
+    "rubro_a": 53,
+    "rubro_b": 118,
+    "valor_propuesto": 0.01,
+    "codigo_a": "EN04",
+    "codigo_b": "AG02"
+  },
+  {
+    "rubro_a": 58,
+    "rubro_b": 105,
+    "valor_propuesto": 0.45,
+    "codigo_a": "EN09",
+    "codigo_b": "CM04"
+  },
+  {
+    "rubro_a": 59,
+    "rubro_b": 60,
+    "valor_propuesto": 0.6,
+    "codigo_a": "EN10",
+    "codigo_b": "EN11"
+  },
+  {
+    "rubro_a": 60,
+    "rubro_b": 86,
+    "valor_propuesto": 0.55,
+    "codigo_a": "EN11",
+    "codigo_b": "SA03"
+  },
+  {
+    "rubro_a": 62,
+    "rubro_b": 68,
+    "valor_propuesto": 0.5,
+    "codigo_a": "SP01",
+    "codigo_b": "SP07"
+  },
+  {
+    "rubro_a": 63,
+    "rubro_b": 73,
+    "valor_propuesto": 0.75,
+    "codigo_a": "SP02",
+    "codigo_b": "SP12"
+  },
+  {
+    "rubro_a": 64,
+    "rubro_b": 128,
+    "valor_propuesto": 0.75,
+    "codigo_a": "SP03",
+    "codigo_b": "FI06"
+  },
+  {
+    "rubro_a": 65,
+    "rubro_b": 66,
+    "valor_propuesto": 0.5,
+    "codigo_a": "SP04",
+    "codigo_b": "SP05"
+  },
+  {
+    "rubro_a": 65,
+    "rubro_b": 77,
+    "valor_propuesto": 0.55,
+    "codigo_a": "SP04",
+    "codigo_b": "ED03"
+  },
+  {
+    "rubro_a": 66,
+    "rubro_b": 85,
+    "valor_propuesto": 0.45,
+    "codigo_a": "SP05",
+    "codigo_b": "SA02"
+  },
+  {
+    "rubro_a": 69,
+    "rubro_b": 70,
+    "valor_propuesto": 0.55,
+    "codigo_a": "SP08",
+    "codigo_b": "SP09"
+  },
+  {
+    "rubro_a": 69,
+    "rubro_b": 92,
+    "valor_propuesto": 0.6,
+    "codigo_a": "SP08",
+    "codigo_b": "CO00"
+  },
+  {
+    "rubro_a": 70,
+    "rubro_b": 119,
+    "valor_propuesto": 0.35,
+    "codigo_a": "SP09",
+    "codigo_b": "AG03"
+  },
+  {
+    "rubro_a": 71,
+    "rubro_b": 93,
+    "valor_propuesto": 0.5,
+    "codigo_a": "SP10",
+    "codigo_b": "CO01"
+  },
+  {
+    "rubro_a": 74,
+    "rubro_b": 75,
+    "valor_propuesto": 0.75,
+    "codigo_a": "ED00",
+    "codigo_b": "ED01"
+  },
+  {
+    "rubro_a": 74,
+    "rubro_b": 76,
+    "valor_propuesto": 0.75,
+    "codigo_a": "ED00",
+    "codigo_b": "ED02"
+  },
+  {
+    "rubro_a": 75,
+    "rubro_b": 131,
+    "valor_propuesto": 0.55,
+    "codigo_a": "ED01",
+    "codigo_b": "CI01"
+  },
+  {
+    "rubro_a": 81,
+    "rubro_b": 122,
+    "valor_propuesto": 0.5,
+    "codigo_a": "ED07",
+    "codigo_b": "FI00"
+  },
+  {
+    "rubro_a": 83,
+    "rubro_b": 84,
+    "valor_propuesto": 0.8,
+    "codigo_a": "SA00",
+    "codigo_b": "SA01"
+  },
+  {
+    "rubro_a": 83,
+    "rubro_b": 85,
+    "valor_propuesto": 0.7,
+    "codigo_a": "SA00",
+    "codigo_b": "SA02"
+  },
+  {
+    "rubro_a": 83,
+    "rubro_b": 134,
+    "valor_propuesto": 0.5,
+    "codigo_a": "SA00",
+    "codigo_b": "CI04"
+  },
+  {
+    "rubro_a": 87,
+    "rubro_b": 126,
+    "valor_propuesto": 0.02,
+    "codigo_a": "SA04",
+    "codigo_b": "FI04"
+  },
+  {
+    "rubro_a": 92,
+    "rubro_b": 93,
+    "valor_propuesto": 0.8,
+    "codigo_a": "CO00",
+    "codigo_b": "CO01"
+  },
+  {
+    "rubro_a": 92,
+    "rubro_b": 94,
+    "valor_propuesto": 0.8,
+    "codigo_a": "CO00",
+    "codigo_b": "CO02"
+  },
+  {
+    "rubro_a": 93,
+    "rubro_b": 94,
+    "valor_propuesto": 0.65,
+    "codigo_a": "CO01",
+    "codigo_b": "CO02"
+  },
+  {
+    "rubro_a": 96,
+    "rubro_b": 99,
+    "valor_propuesto": 0.55,
+    "codigo_a": "CO04",
+    "codigo_b": "CO07"
+  },
+  {
+    "rubro_a": 99,
+    "rubro_b": 120,
+    "valor_propuesto": 0.5,
+    "codigo_a": "CO07",
+    "codigo_b": "AG04"
+  },
+  {
+    "rubro_a": 102,
+    "rubro_b": 111,
+    "valor_propuesto": 0.45,
+    "codigo_a": "CM01",
+    "codigo_b": "LO01"
+  },
+  {
+    "rubro_a": 104,
+    "rubro_b": 112,
+    "valor_propuesto": 0.55,
+    "codigo_a": "CM03",
+    "codigo_b": "LO02"
+  },
+  {
+    "rubro_a": 104,
+    "rubro_b": 114,
+    "valor_propuesto": 0.55,
+    "codigo_a": "CM03",
+    "codigo_b": "LO04"
+  },
+  {
+    "rubro_a": 105,
+    "rubro_b": 106,
+    "valor_propuesto": 0.8,
+    "codigo_a": "CM04",
+    "codigo_b": "CM05"
+  },
+  {
+    "rubro_a": 105,
+    "rubro_b": 107,
+    "valor_propuesto": 0.7,
+    "codigo_a": "CM04",
+    "codigo_b": "CM06"
+  },
+  {
+    "rubro_a": 105,
+    "rubro_b": 117,
+    "valor_propuesto": 0.35,
+    "codigo_a": "CM04",
+    "codigo_b": "AG01"
+  },
+  {
+    "rubro_a": 108,
+    "rubro_b": 137,
+    "valor_propuesto": 0.1,
+    "codigo_a": "CM07",
+    "codigo_b": "GO01"
+  },
+  {
+    "rubro_a": 111,
+    "rubro_b": 112,
+    "valor_propuesto": 0.5,
+    "codigo_a": "LO01",
+    "codigo_b": "LO02"
+  },
+  {
+    "rubro_a": 113,
+    "rubro_b": 114,
+    "valor_propuesto": 0.55,
+    "codigo_a": "LO03",
+    "codigo_b": "LO04"
+  },
+  {
+    "rubro_a": 115,
+    "rubro_b": 131,
+    "valor_propuesto": 0.05,
+    "codigo_a": "LO05",
+    "codigo_b": "CI01"
+  },
+  {
+    "rubro_a": 117,
+    "rubro_b": 118,
+    "valor_propuesto": 0.5,
+    "codigo_a": "AG01",
+    "codigo_b": "AG02"
+  },
+  {
+    "rubro_a": 117,
+    "rubro_b": 134,
+    "valor_propuesto": 0.4,
+    "codigo_a": "AG01",
+    "codigo_b": "CI04"
+  },
+  {
+    "rubro_a": 120,
+    "rubro_b": 135,
+    "valor_propuesto": 0.6,
+    "codigo_a": "AG04",
+    "codigo_b": "CI05"
+  },
+  {
+    "rubro_a": 122,
+    "rubro_b": 124,
+    "valor_propuesto": 0.75,
+    "codigo_a": "FI00",
+    "codigo_b": "FI02"
+  },
+  {
+    "rubro_a": 123,
+    "rubro_b": 124,
+    "valor_propuesto": 0.55,
+    "codigo_a": "FI01",
+    "codigo_b": "FI02"
+  },
+  {
+    "rubro_a": 124,
+    "rubro_b": 126,
+    "valor_propuesto": 0.7,
+    "codigo_a": "FI02",
+    "codigo_b": "FI04"
+  },
+  {
+    "rubro_a": 125,
+    "rubro_b": 126,
+    "valor_propuesto": 0.55,
+    "codigo_a": "FI03",
+    "codigo_b": "FI04"
+  },
+  {
+    "rubro_a": 132,
+    "rubro_b": 137,
+    "valor_propuesto": 0.4,
+    "codigo_a": "CI02",
+    "codigo_b": "GO01"
+  },
+  {
+    "rubro_a": 138,
+    "rubro_b": 139,
+    "valor_propuesto": 0.5,
+    "codigo_a": "GO02",
+    "codigo_b": "GO03"
+  },
+  {
+    "rubro_a": 138,
+    "rubro_b": 140,
+    "valor_propuesto": 0.55,
+    "codigo_a": "GO02",
+    "codigo_b": "GO04"
+  }
+]

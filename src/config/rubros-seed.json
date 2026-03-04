@@ -1,0 +1,1548 @@
+[
+  {
+    "id": 1,
+    "codigo": "T00",
+    "nombre": "Tecnología",
+    "nombre_en": "Technology",
+    "descripcion": "Sector raíz de tecnología",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 2,
+    "codigo": "T01",
+    "nombre": "Desarrollo de Software",
+    "nombre_en": "Software Development",
+    "descripcion": "Diseño, codificación y mantenimiento de software",
+    "padres": [
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 3,
+    "codigo": "T02",
+    "nombre": "Desarrollo Web",
+    "nombre_en": "Web Development",
+    "descripcion": "Frontend, backend y full-stack web",
+    "padres": [
+      2
+    ],
+    "activo": true
+  },
+  {
+    "id": 4,
+    "codigo": "T03",
+    "nombre": "Desarrollo Frontend",
+    "nombre_en": "Frontend Development",
+    "descripcion": "Interfaces de usuario web (React, Vue, Angular)",
+    "padres": [
+      3
+    ],
+    "activo": true
+  },
+  {
+    "id": 5,
+    "codigo": "T04",
+    "nombre": "Desarrollo Backend",
+    "nombre_en": "Backend Development",
+    "descripcion": "Servidores, APIs, lógica de negocio",
+    "padres": [
+      3
+    ],
+    "activo": true
+  },
+  {
+    "id": 6,
+    "codigo": "T05",
+    "nombre": "Desarrollo Mobile",
+    "nombre_en": "Mobile Development",
+    "descripcion": "Apps iOS, Android, cross-platform",
+    "padres": [
+      2
+    ],
+    "activo": true
+  },
+  {
+    "id": 7,
+    "codigo": "T06",
+    "nombre": "DevOps & Infraestructura",
+    "nombre_en": "DevOps & Infrastructure",
+    "descripcion": "CI/CD, cloud, contenedores, servidores",
+    "padres": [
+      2
+    ],
+    "activo": true
+  },
+  {
+    "id": 8,
+    "codigo": "T07",
+    "nombre": "Ciberseguridad",
+    "nombre_en": "Cybersecurity",
+    "descripcion": "Seguridad informática, pentesting, compliance",
+    "padres": [
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 9,
+    "codigo": "T08",
+    "nombre": "Inteligencia Artificial",
+    "nombre_en": "Artificial Intelligence",
+    "descripcion": "ML, deep learning, NLP, computer vision",
+    "padres": [
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 10,
+    "codigo": "T09",
+    "nombre": "Ciencia de Datos",
+    "nombre_en": "Data Science",
+    "descripcion": "Análisis, estadística, visualización de datos",
+    "padres": [
+      1,
+      9
+    ],
+    "activo": true
+  },
+  {
+    "id": 11,
+    "codigo": "T10",
+    "nombre": "Blockchain & Web3",
+    "nombre_en": "Blockchain & Web3",
+    "descripcion": "Smart contracts, DeFi, NFTs, protocolos",
+    "padres": [
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 12,
+    "codigo": "T11",
+    "nombre": "Desarrollo Smart Contracts",
+    "nombre_en": "Smart Contract Dev",
+    "descripcion": "Solidity, Rust, auditoría de contratos",
+    "padres": [
+      11,
+      2
+    ],
+    "activo": true
+  },
+  {
+    "id": 13,
+    "codigo": "T12",
+    "nombre": "Redes y Telecomunicaciones",
+    "nombre_en": "Networking & Telecom",
+    "descripcion": "Infraestructura de red, protocolos, ISPs",
+    "padres": [
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 14,
+    "codigo": "T13",
+    "nombre": "Soporte Técnico",
+    "nombre_en": "Technical Support",
+    "descripcion": "Help desk, troubleshooting, mantenimiento",
+    "padres": [
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 15,
+    "codigo": "T14",
+    "nombre": "Diseño UX/UI",
+    "nombre_en": "UX/UI Design",
+    "descripcion": "Experiencia de usuario, interfaces, prototipos",
+    "padres": [
+      1,
+      25
+    ],
+    "activo": true
+  },
+  {
+    "id": 16,
+    "codigo": "T15",
+    "nombre": "Automatización Industrial",
+    "nombre_en": "Industrial Automation",
+    "descripcion": "PLC, SCADA, robótica industrial",
+    "padres": [
+      1,
+      97
+    ],
+    "activo": true
+  },
+  {
+    "id": 17,
+    "codigo": "T16",
+    "nombre": "IoT (Internet de las Cosas)",
+    "nombre_en": "IoT",
+    "descripcion": "Sensores, dispositivos conectados, edge computing",
+    "padres": [
+      1,
+      13
+    ],
+    "activo": true
+  },
+  {
+    "id": 18,
+    "codigo": "T17",
+    "nombre": "Realidad Virtual/Aumentada",
+    "nombre_en": "VR/AR",
+    "descripcion": "Inmersión digital, experiencias XR",
+    "padres": [
+      1,
+      49
+    ],
+    "activo": true
+  },
+  {
+    "id": 19,
+    "codigo": "T18",
+    "nombre": "Bases de Datos",
+    "nombre_en": "Databases",
+    "descripcion": "SQL, NoSQL, administración de datos",
+    "padres": [
+      2
+    ],
+    "activo": true
+  },
+  {
+    "id": 20,
+    "codigo": "T19",
+    "nombre": "QA & Testing",
+    "nombre_en": "QA & Testing",
+    "descripcion": "Control de calidad, pruebas automatizadas",
+    "padres": [
+      2
+    ],
+    "activo": true
+  },
+  {
+    "id": 21,
+    "codigo": "A00",
+    "nombre": "Artes",
+    "nombre_en": "Arts",
+    "descripcion": "Sector raíz de artes y expresión creativa",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 22,
+    "codigo": "A01",
+    "nombre": "Artes Visuales",
+    "nombre_en": "Visual Arts",
+    "descripcion": "Pintura, escultura, instalación",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 23,
+    "codigo": "A02",
+    "nombre": "Fotografía",
+    "nombre_en": "Photography",
+    "descripcion": "Fotografía artística, comercial, documental",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 24,
+    "codigo": "A03",
+    "nombre": "Ilustración",
+    "nombre_en": "Illustration",
+    "descripcion": "Ilustración digital y tradicional",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 25,
+    "codigo": "A04",
+    "nombre": "Diseño Gráfico",
+    "nombre_en": "Graphic Design",
+    "descripcion": "Identidad visual, layouts, composición",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 26,
+    "codigo": "A05",
+    "nombre": "Música",
+    "nombre_en": "Music",
+    "descripcion": "Composición, interpretación, producción",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 27,
+    "codigo": "A06",
+    "nombre": "Producción Musical",
+    "nombre_en": "Music Production",
+    "descripcion": "Grabación, mezcla, mastering",
+    "padres": [
+      26
+    ],
+    "activo": true
+  },
+  {
+    "id": 28,
+    "codigo": "A07",
+    "nombre": "Cine y Video",
+    "nombre_en": "Film & Video",
+    "descripcion": "Dirección, cinematografía, edición",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 29,
+    "codigo": "A08",
+    "nombre": "Animación",
+    "nombre_en": "Animation",
+    "descripcion": "2D, 3D, motion graphics",
+    "padres": [
+      21,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 30,
+    "codigo": "A09",
+    "nombre": "Arte Digital",
+    "nombre_en": "Digital Art",
+    "descripcion": "NFTs, arte generativo, AI art",
+    "padres": [
+      21,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 31,
+    "codigo": "A10",
+    "nombre": "Teatro y Artes Escénicas",
+    "nombre_en": "Performing Arts",
+    "descripcion": "Actuación, dirección escénica",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 32,
+    "codigo": "A11",
+    "nombre": "Danza",
+    "nombre_en": "Dance",
+    "descripcion": "Coreografía, interpretación",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 33,
+    "codigo": "A12",
+    "nombre": "Literatura y Escritura",
+    "nombre_en": "Literature & Writing",
+    "descripcion": "Narrativa, poesía, ensayo",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 34,
+    "codigo": "A13",
+    "nombre": "Artesanía",
+    "nombre_en": "Crafts",
+    "descripcion": "Trabajo manual, cerámica, textil",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 35,
+    "codigo": "A14",
+    "nombre": "Diseño de Moda",
+    "nombre_en": "Fashion Design",
+    "descripcion": "Ropa, accesorios, textiles",
+    "padres": [
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 36,
+    "codigo": "M00",
+    "nombre": "Mercadotecnia",
+    "nombre_en": "Marketing",
+    "descripcion": "Sector raíz de marketing y comunicación comercial",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 37,
+    "codigo": "M01",
+    "nombre": "Marketing Digital",
+    "nombre_en": "Digital Marketing",
+    "descripcion": "SEO, SEM, analytics, funnel",
+    "padres": [
+      36,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 38,
+    "codigo": "M02",
+    "nombre": "Redes Sociales",
+    "nombre_en": "Social Media",
+    "descripcion": "Gestión de comunidades, content creation",
+    "padres": [
+      37
+    ],
+    "activo": true
+  },
+  {
+    "id": 39,
+    "codigo": "M03",
+    "nombre": "Email Marketing",
+    "nombre_en": "Email Marketing",
+    "descripcion": "Newsletters, automatización, segmentación",
+    "padres": [
+      37
+    ],
+    "activo": true
+  },
+  {
+    "id": 40,
+    "codigo": "M04",
+    "nombre": "Content Marketing",
+    "nombre_en": "Content Marketing",
+    "descripcion": "Estrategia de contenido, storytelling",
+    "padres": [
+      36
+    ],
+    "activo": true
+  },
+  {
+    "id": 41,
+    "codigo": "M05",
+    "nombre": "Branding",
+    "nombre_en": "Branding",
+    "descripcion": "Identidad de marca, posicionamiento",
+    "padres": [
+      36,
+      25
+    ],
+    "activo": true
+  },
+  {
+    "id": 42,
+    "codigo": "M06",
+    "nombre": "Publicidad",
+    "nombre_en": "Advertising",
+    "descripcion": "Campañas publicitarias, medios pagados",
+    "padres": [
+      36
+    ],
+    "activo": true
+  },
+  {
+    "id": 43,
+    "codigo": "M07",
+    "nombre": "Relaciones Públicas",
+    "nombre_en": "Public Relations",
+    "descripcion": "Comunicación corporativa, crisis management",
+    "padres": [
+      36
+    ],
+    "activo": true
+  },
+  {
+    "id": 44,
+    "codigo": "M08",
+    "nombre": "Growth Hacking",
+    "nombre_en": "Growth Hacking",
+    "descripcion": "Experimentación, viralidad, métricas",
+    "padres": [
+      37
+    ],
+    "activo": true
+  },
+  {
+    "id": 45,
+    "codigo": "M09",
+    "nombre": "Copywriting",
+    "nombre_en": "Copywriting",
+    "descripcion": "Textos persuasivos, guiones publicitarios",
+    "padres": [
+      36,
+      33
+    ],
+    "activo": true
+  },
+  {
+    "id": 46,
+    "codigo": "M10",
+    "nombre": "Investigación de Mercado",
+    "nombre_en": "Market Research",
+    "descripcion": "Estudios, encuestas, análisis competitivo",
+    "padres": [
+      36
+    ],
+    "activo": true
+  },
+  {
+    "id": 47,
+    "codigo": "M11",
+    "nombre": "Trade Marketing",
+    "nombre_en": "Trade Marketing",
+    "descripcion": "Punto de venta, merchandising, retail",
+    "padres": [
+      36
+    ],
+    "activo": true
+  },
+  {
+    "id": 48,
+    "codigo": "M12",
+    "nombre": "Influencer Marketing",
+    "nombre_en": "Influencer Marketing",
+    "descripcion": "Colaboraciones, embajadores de marca",
+    "padres": [
+      38
+    ],
+    "activo": true
+  },
+  {
+    "id": 49,
+    "codigo": "EN00",
+    "nombre": "Entretenimiento",
+    "nombre_en": "Entertainment",
+    "descripcion": "Sector raíz de entretenimiento",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 50,
+    "codigo": "EN01",
+    "nombre": "Producción de Eventos",
+    "nombre_en": "Event Production",
+    "descripcion": "Conciertos, festivales, conferencias",
+    "padres": [
+      49
+    ],
+    "activo": true
+  },
+  {
+    "id": 51,
+    "codigo": "EN02",
+    "nombre": "Videojuegos",
+    "nombre_en": "Video Games",
+    "descripcion": "Diseño, desarrollo, publicación",
+    "padres": [
+      49,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 52,
+    "codigo": "EN03",
+    "nombre": "Game Design",
+    "nombre_en": "Game Design",
+    "descripcion": "Mecánicas, narrativa, level design",
+    "padres": [
+      51
+    ],
+    "activo": true
+  },
+  {
+    "id": 53,
+    "codigo": "EN04",
+    "nombre": "Esports",
+    "nombre_en": "Esports",
+    "descripcion": "Competencias, equipos, streaming",
+    "padres": [
+      51
+    ],
+    "activo": true
+  },
+  {
+    "id": 54,
+    "codigo": "EN05",
+    "nombre": "Streaming y Podcasting",
+    "nombre_en": "Streaming & Podcasting",
+    "descripcion": "Contenido en vivo, audio bajo demanda",
+    "padres": [
+      49,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 55,
+    "codigo": "EN06",
+    "nombre": "Producción Audiovisual",
+    "nombre_en": "Audiovisual Production",
+    "descripcion": "TV, series, documentales",
+    "padres": [
+      49,
+      28
+    ],
+    "activo": true
+  },
+  {
+    "id": 56,
+    "codigo": "EN07",
+    "nombre": "DJ y Música en Vivo",
+    "nombre_en": "DJ & Live Music",
+    "descripcion": "Sets, performances, booking",
+    "padres": [
+      49,
+      26
+    ],
+    "activo": true
+  },
+  {
+    "id": 57,
+    "codigo": "EN08",
+    "nombre": "Comedia y Stand-up",
+    "nombre_en": "Comedy & Stand-up",
+    "descripcion": "Shows de comedia, guiones",
+    "padres": [
+      49,
+      31
+    ],
+    "activo": true
+  },
+  {
+    "id": 58,
+    "codigo": "EN09",
+    "nombre": "Turismo y Hospitalidad",
+    "nombre_en": "Tourism & Hospitality",
+    "descripcion": "Experiencias turísticas, hotelería",
+    "padres": [
+      49
+    ],
+    "activo": true
+  },
+  {
+    "id": 59,
+    "codigo": "EN10",
+    "nombre": "Deportes",
+    "nombre_en": "Sports",
+    "descripcion": "Organización deportiva, entrenamiento",
+    "padres": [
+      49
+    ],
+    "activo": true
+  },
+  {
+    "id": 60,
+    "codigo": "EN11",
+    "nombre": "Fitness y Bienestar",
+    "nombre_en": "Fitness & Wellness",
+    "descripcion": "Entrenamiento personal, yoga, nutrición deportiva",
+    "padres": [
+      59,
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 61,
+    "codigo": "SP00",
+    "nombre": "Servicios Profesionales",
+    "nombre_en": "Professional Services",
+    "descripcion": "Sector raíz de servicios especializados",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 62,
+    "codigo": "SP01",
+    "nombre": "Consultoría de Negocios",
+    "nombre_en": "Business Consulting",
+    "descripcion": "Estrategia, operaciones, transformación",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 63,
+    "codigo": "SP02",
+    "nombre": "Servicios Legales",
+    "nombre_en": "Legal Services",
+    "descripcion": "Abogacía, contratos, propiedad intelectual",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 64,
+    "codigo": "SP03",
+    "nombre": "Contabilidad y Finanzas",
+    "nombre_en": "Accounting & Finance",
+    "descripcion": "Contabilidad, auditoría, fiscal",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 65,
+    "codigo": "SP04",
+    "nombre": "Recursos Humanos",
+    "nombre_en": "Human Resources",
+    "descripcion": "Reclutamiento, capacitación, cultura",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 66,
+    "codigo": "SP05",
+    "nombre": "Coaching y Mentoring",
+    "nombre_en": "Coaching & Mentoring",
+    "descripcion": "Desarrollo personal y profesional",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 67,
+    "codigo": "SP06",
+    "nombre": "Traducción e Interpretación",
+    "nombre_en": "Translation",
+    "descripcion": "Idiomas, localización, interpretación",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 68,
+    "codigo": "SP07",
+    "nombre": "Gestión de Proyectos",
+    "nombre_en": "Project Management",
+    "descripcion": "PMO, Agile, Scrum, planificación",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 69,
+    "codigo": "SP08",
+    "nombre": "Arquitectura",
+    "nombre_en": "Architecture",
+    "descripcion": "Diseño arquitectónico, planos",
+    "padres": [
+      61,
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 70,
+    "codigo": "SP09",
+    "nombre": "Diseño de Interiores",
+    "nombre_en": "Interior Design",
+    "descripcion": "Espacios, decoración, funcionalidad",
+    "padres": [
+      61,
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 71,
+    "codigo": "SP10",
+    "nombre": "Bienes Raíces",
+    "nombre_en": "Real Estate",
+    "descripcion": "Compra-venta, valuación, desarrollo",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 72,
+    "codigo": "SP11",
+    "nombre": "Seguros",
+    "nombre_en": "Insurance",
+    "descripcion": "Pólizas, risk management, claims",
+    "padres": [
+      61
+    ],
+    "activo": true
+  },
+  {
+    "id": 73,
+    "codigo": "SP12",
+    "nombre": "Notaría y Fe Pública",
+    "nombre_en": "Notary Services",
+    "descripcion": "Certificación, escrituras",
+    "padres": [
+      63
+    ],
+    "activo": true
+  },
+  {
+    "id": 74,
+    "codigo": "ED00",
+    "nombre": "Educación",
+    "nombre_en": "Education",
+    "descripcion": "Sector raíz de educación y formación",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 75,
+    "codigo": "ED01",
+    "nombre": "Educación Formal",
+    "nombre_en": "Formal Education",
+    "descripcion": "Escuelas, universidades, certificaciones",
+    "padres": [
+      74
+    ],
+    "activo": true
+  },
+  {
+    "id": 76,
+    "codigo": "ED02",
+    "nombre": "Educación Online",
+    "nombre_en": "Online Education",
+    "descripcion": "E-learning, MOOCs, plataformas digitales",
+    "padres": [
+      74,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 77,
+    "codigo": "ED03",
+    "nombre": "Capacitación Corporativa",
+    "nombre_en": "Corporate Training",
+    "descripcion": "Talleres, workshops empresariales",
+    "padres": [
+      74,
+      65
+    ],
+    "activo": true
+  },
+  {
+    "id": 78,
+    "codigo": "ED04",
+    "nombre": "Tutoría y Clases Particulares",
+    "nombre_en": "Tutoring",
+    "descripcion": "Enseñanza individual o grupos pequeños",
+    "padres": [
+      74
+    ],
+    "activo": true
+  },
+  {
+    "id": 79,
+    "codigo": "ED05",
+    "nombre": "Educación STEM",
+    "nombre_en": "STEM Education",
+    "descripcion": "Ciencia, tecnología, ingeniería, matemáticas",
+    "padres": [
+      74,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 80,
+    "codigo": "ED06",
+    "nombre": "Educación Artística",
+    "nombre_en": "Arts Education",
+    "descripcion": "Enseñanza de artes y creatividad",
+    "padres": [
+      74,
+      21
+    ],
+    "activo": true
+  },
+  {
+    "id": 81,
+    "codigo": "ED07",
+    "nombre": "Educación Financiera",
+    "nombre_en": "Financial Education",
+    "descripcion": "Finanzas personales, inversión, ahorro",
+    "padres": [
+      74,
+      64
+    ],
+    "activo": true
+  },
+  {
+    "id": 82,
+    "codigo": "ED08",
+    "nombre": "Idiomas",
+    "nombre_en": "Language Education",
+    "descripcion": "Enseñanza de idiomas",
+    "padres": [
+      74
+    ],
+    "activo": true
+  },
+  {
+    "id": 83,
+    "codigo": "SA00",
+    "nombre": "Salud",
+    "nombre_en": "Health",
+    "descripcion": "Sector raíz de salud y bienestar",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 84,
+    "codigo": "SA01",
+    "nombre": "Medicina General",
+    "nombre_en": "General Medicine",
+    "descripcion": "Consulta médica, diagnóstico",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 85,
+    "codigo": "SA02",
+    "nombre": "Salud Mental",
+    "nombre_en": "Mental Health",
+    "descripcion": "Psicología, psiquiatría, terapia",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 86,
+    "codigo": "SA03",
+    "nombre": "Nutrición",
+    "nombre_en": "Nutrition",
+    "descripcion": "Dietas, planes alimenticios, asesoría",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 87,
+    "codigo": "SA04",
+    "nombre": "Fisioterapia",
+    "nombre_en": "Physiotherapy",
+    "descripcion": "Rehabilitación, terapia física",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 88,
+    "codigo": "SA05",
+    "nombre": "Medicina Alternativa",
+    "nombre_en": "Alternative Medicine",
+    "descripcion": "Homeopatía, acupuntura, naturismo",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 89,
+    "codigo": "SA06",
+    "nombre": "Odontología",
+    "nombre_en": "Dentistry",
+    "descripcion": "Servicios dentales",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 90,
+    "codigo": "SA07",
+    "nombre": "Veterinaria",
+    "nombre_en": "Veterinary",
+    "descripcion": "Salud animal",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 91,
+    "codigo": "SA08",
+    "nombre": "Farmacia",
+    "nombre_en": "Pharmacy",
+    "descripcion": "Medicamentos, asesoría farmacéutica",
+    "padres": [
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 92,
+    "codigo": "CO00",
+    "nombre": "Construcción e Ingeniería",
+    "nombre_en": "Construction & Engineering",
+    "descripcion": "Sector raíz",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 93,
+    "codigo": "CO01",
+    "nombre": "Construcción Residencial",
+    "nombre_en": "Residential Construction",
+    "descripcion": "Casas, departamentos, remodelaciones",
+    "padres": [
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 94,
+    "codigo": "CO02",
+    "nombre": "Construcción Comercial",
+    "nombre_en": "Commercial Construction",
+    "descripcion": "Oficinas, locales, naves industriales",
+    "padres": [
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 95,
+    "codigo": "CO03",
+    "nombre": "Ingeniería Civil",
+    "nombre_en": "Civil Engineering",
+    "descripcion": "Infraestructura, vías, puentes",
+    "padres": [
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 96,
+    "codigo": "CO04",
+    "nombre": "Ingeniería Eléctrica",
+    "nombre_en": "Electrical Engineering",
+    "descripcion": "Instalaciones eléctricas, energía",
+    "padres": [
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 97,
+    "codigo": "CO05",
+    "nombre": "Ingeniería Mecánica",
+    "nombre_en": "Mechanical Engineering",
+    "descripcion": "Máquinas, manufactura, mantenimiento",
+    "padres": [
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 98,
+    "codigo": "CO06",
+    "nombre": "Plomería e Instalaciones",
+    "nombre_en": "Plumbing & Installations",
+    "descripcion": "Agua, gas, instalaciones hidráulicas",
+    "padres": [
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 99,
+    "codigo": "CO07",
+    "nombre": "Energías Renovables",
+    "nombre_en": "Renewable Energy",
+    "descripcion": "Solar, eólica, eficiencia energética",
+    "padres": [
+      92,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 100,
+    "codigo": "CO08",
+    "nombre": "Topografía y Agrimensura",
+    "nombre_en": "Surveying",
+    "descripcion": "Medición de terrenos, mapeo",
+    "padres": [
+      92
+    ],
+    "activo": true
+  },
+  {
+    "id": 101,
+    "codigo": "CM00",
+    "nombre": "Comercio",
+    "nombre_en": "Commerce",
+    "descripcion": "Sector raíz de comercio",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 102,
+    "codigo": "CM01",
+    "nombre": "E-commerce",
+    "nombre_en": "E-commerce",
+    "descripcion": "Tiendas online, marketplaces",
+    "padres": [
+      101,
+      1
+    ],
+    "activo": true
+  },
+  {
+    "id": 103,
+    "codigo": "CM02",
+    "nombre": "Retail",
+    "nombre_en": "Retail",
+    "descripcion": "Venta al menudeo, tiendas físicas",
+    "padres": [
+      101
+    ],
+    "activo": true
+  },
+  {
+    "id": 104,
+    "codigo": "CM03",
+    "nombre": "Importación/Exportación",
+    "nombre_en": "Import/Export",
+    "descripcion": "Comercio internacional, aduanas",
+    "padres": [
+      101
+    ],
+    "activo": true
+  },
+  {
+    "id": 105,
+    "codigo": "CM04",
+    "nombre": "Gastronomía",
+    "nombre_en": "Gastronomy",
+    "descripcion": "Restaurantes, catering, food trucks",
+    "padres": [
+      101
+    ],
+    "activo": true
+  },
+  {
+    "id": 106,
+    "codigo": "CM05",
+    "nombre": "Panadería y Repostería",
+    "nombre_en": "Bakery & Pastry",
+    "descripcion": "Productos horneados, pastelería",
+    "padres": [
+      105
+    ],
+    "activo": true
+  },
+  {
+    "id": 107,
+    "codigo": "CM06",
+    "nombre": "Cafeterías y Barismo",
+    "nombre_en": "Coffee & Barista",
+    "descripcion": "Café de especialidad, preparación",
+    "padres": [
+      105
+    ],
+    "activo": true
+  },
+  {
+    "id": 108,
+    "codigo": "CM07",
+    "nombre": "Cervecería Artesanal",
+    "nombre_en": "Craft Brewery",
+    "descripcion": "Producción y venta de cerveza artesanal",
+    "padres": [
+      105
+    ],
+    "activo": true
+  },
+  {
+    "id": 109,
+    "codigo": "CM08",
+    "nombre": "Venta Mayorista",
+    "nombre_en": "Wholesale",
+    "descripcion": "Distribución, venta por volumen",
+    "padres": [
+      101
+    ],
+    "activo": true
+  },
+  {
+    "id": 110,
+    "codigo": "LO00",
+    "nombre": "Logística y Transporte",
+    "nombre_en": "Logistics & Transport",
+    "descripcion": "Sector raíz",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 111,
+    "codigo": "LO01",
+    "nombre": "Mensajería y Paquetería",
+    "nombre_en": "Courier & Parcel",
+    "descripcion": "Entregas last-mile, paquetería",
+    "padres": [
+      110
+    ],
+    "activo": true
+  },
+  {
+    "id": 112,
+    "codigo": "LO02",
+    "nombre": "Transporte de Carga",
+    "nombre_en": "Freight Transport",
+    "descripcion": "Mudanzas, fletes, carga pesada",
+    "padres": [
+      110
+    ],
+    "activo": true
+  },
+  {
+    "id": 113,
+    "codigo": "LO03",
+    "nombre": "Almacenamiento",
+    "nombre_en": "Warehousing",
+    "descripcion": "Bodegas, inventario, fulfillment",
+    "padres": [
+      110
+    ],
+    "activo": true
+  },
+  {
+    "id": 114,
+    "codigo": "LO04",
+    "nombre": "Cadena de Suministro",
+    "nombre_en": "Supply Chain",
+    "descripcion": "Procurement, gestión de proveedores",
+    "padres": [
+      110
+    ],
+    "activo": true
+  },
+  {
+    "id": 115,
+    "codigo": "LO05",
+    "nombre": "Transporte de Pasajeros",
+    "nombre_en": "Passenger Transport",
+    "descripcion": "Taxis, ride-sharing, shuttles",
+    "padres": [
+      110
+    ],
+    "activo": true
+  },
+  {
+    "id": 116,
+    "codigo": "AG00",
+    "nombre": "Agricultura y Medio Ambiente",
+    "nombre_en": "Agriculture & Environment",
+    "descripcion": "Sector raíz",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 117,
+    "codigo": "AG01",
+    "nombre": "Agricultura",
+    "nombre_en": "Agriculture",
+    "descripcion": "Cultivos, cosecha, agroindustria",
+    "padres": [
+      116
+    ],
+    "activo": true
+  },
+  {
+    "id": 118,
+    "codigo": "AG02",
+    "nombre": "Ganadería",
+    "nombre_en": "Livestock",
+    "descripcion": "Cría de animales, producción pecuaria",
+    "padres": [
+      116
+    ],
+    "activo": true
+  },
+  {
+    "id": 119,
+    "codigo": "AG03",
+    "nombre": "Jardinería y Paisajismo",
+    "nombre_en": "Landscaping",
+    "descripcion": "Diseño de jardines, mantenimiento",
+    "padres": [
+      116
+    ],
+    "activo": true
+  },
+  {
+    "id": 120,
+    "codigo": "AG04",
+    "nombre": "Medio Ambiente",
+    "nombre_en": "Environmental Services",
+    "descripcion": "Consultoría ambiental, sustentabilidad",
+    "padres": [
+      116
+    ],
+    "activo": true
+  },
+  {
+    "id": 121,
+    "codigo": "AG05",
+    "nombre": "Acuicultura",
+    "nombre_en": "Aquaculture",
+    "descripcion": "Pesca, cultivo acuático",
+    "padres": [
+      116
+    ],
+    "activo": true
+  },
+  {
+    "id": 122,
+    "codigo": "FI00",
+    "nombre": "Finanzas y Crypto",
+    "nombre_en": "Finance & Crypto",
+    "descripcion": "Sector raíz",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 123,
+    "codigo": "FI01",
+    "nombre": "Banca y Crédito",
+    "nombre_en": "Banking & Credit",
+    "descripcion": "Servicios bancarios, préstamos",
+    "padres": [
+      122
+    ],
+    "activo": true
+  },
+  {
+    "id": 124,
+    "codigo": "FI02",
+    "nombre": "Inversiones",
+    "nombre_en": "Investments",
+    "descripcion": "Bolsa, fondos, portafolios",
+    "padres": [
+      122
+    ],
+    "activo": true
+  },
+  {
+    "id": 125,
+    "codigo": "FI03",
+    "nombre": "DeFi",
+    "nombre_en": "DeFi",
+    "descripcion": "Finanzas descentralizadas, yield, lending",
+    "padres": [
+      122,
+      11
+    ],
+    "activo": true
+  },
+  {
+    "id": 126,
+    "codigo": "FI04",
+    "nombre": "Trading",
+    "nombre_en": "Trading",
+    "descripcion": "Compra-venta de activos, análisis técnico",
+    "padres": [
+      122
+    ],
+    "activo": true
+  },
+  {
+    "id": 127,
+    "codigo": "FI05",
+    "nombre": "Tokenomics",
+    "nombre_en": "Tokenomics",
+    "descripcion": "Diseño económico de tokens",
+    "padres": [
+      122,
+      11
+    ],
+    "activo": true
+  },
+  {
+    "id": 128,
+    "codigo": "FI06",
+    "nombre": "Asesoría Financiera",
+    "nombre_en": "Financial Advisory",
+    "descripcion": "Planeación financiera personal/empresarial",
+    "padres": [
+      122,
+      64
+    ],
+    "activo": true
+  },
+  {
+    "id": 129,
+    "codigo": "FI07",
+    "nombre": "Crowdfunding",
+    "nombre_en": "Crowdfunding",
+    "descripcion": "Financiamiento colectivo",
+    "padres": [
+      122
+    ],
+    "activo": true
+  },
+  {
+    "id": 130,
+    "codigo": "CI00",
+    "nombre": "Ciencias e Investigación",
+    "nombre_en": "Sciences & Research",
+    "descripcion": "Sector raíz",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 131,
+    "codigo": "CI01",
+    "nombre": "Investigación Académica",
+    "nombre_en": "Academic Research",
+    "descripcion": "Papers, metodología, peer review",
+    "padres": [
+      130,
+      74
+    ],
+    "activo": true
+  },
+  {
+    "id": 132,
+    "codigo": "CI02",
+    "nombre": "Ciencias Sociales",
+    "nombre_en": "Social Sciences",
+    "descripcion": "Sociología, antropología, política",
+    "padres": [
+      130
+    ],
+    "activo": true
+  },
+  {
+    "id": 133,
+    "codigo": "CI03",
+    "nombre": "Ciencia Cognitiva",
+    "nombre_en": "Cognitive Science",
+    "descripcion": "Multi-padre: Ciencia + Salud Mental + IA",
+    "padres": [
+      130,
+      85,
+      9
+    ],
+    "activo": true
+  },
+  {
+    "id": 134,
+    "codigo": "CI04",
+    "nombre": "Biotecnología",
+    "nombre_en": "Biotechnology",
+    "descripcion": "Ingeniería genética, biofarma",
+    "padres": [
+      130,
+      83
+    ],
+    "activo": true
+  },
+  {
+    "id": 135,
+    "codigo": "CI05",
+    "nombre": "Ciencias Ambientales",
+    "nombre_en": "Environmental Science",
+    "descripcion": "Ecología, cambio climático",
+    "padres": [
+      130,
+      120
+    ],
+    "activo": true
+  },
+  {
+    "id": 136,
+    "codigo": "GO00",
+    "nombre": "Gobierno y ONG",
+    "nombre_en": "Government & NGO",
+    "descripcion": "Sector raíz",
+    "padres": [],
+    "activo": true
+  },
+  {
+    "id": 137,
+    "codigo": "GO01",
+    "nombre": "Administración Pública",
+    "nombre_en": "Public Administration",
+    "descripcion": "Gobierno, políticas públicas",
+    "padres": [
+      136
+    ],
+    "activo": true
+  },
+  {
+    "id": 138,
+    "codigo": "GO02",
+    "nombre": "ONG y Sociedad Civil",
+    "nombre_en": "NGOs & Civil Society",
+    "descripcion": "Organizaciones sin fines de lucro",
+    "padres": [
+      136
+    ],
+    "activo": true
+  },
+  {
+    "id": 139,
+    "codigo": "GO03",
+    "nombre": "Cooperación Internacional",
+    "nombre_en": "International Cooperation",
+    "descripcion": "Desarrollo, ayuda humanitaria",
+    "padres": [
+      136
+    ],
+    "activo": true
+  },
+  {
+    "id": 140,
+    "codigo": "GO04",
+    "nombre": "Activismo y Comunidad",
+    "nombre_en": "Activism & Community",
+    "descripcion": "Organización comunitaria, causas sociales",
+    "padres": [
+      136
+    ],
+    "activo": true
+  }
+]
