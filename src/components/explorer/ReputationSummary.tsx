@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { supabase } from '@/lib/supabase';
+// supabase replaced with fetch
 import { NIVEL_LABELS } from '@/lib/types';
 import { Star, Award, BarChart2, Layers, TrendingUp } from 'lucide-react';
 
@@ -69,42 +69,16 @@ export function ReputationSummary({ wallet }: Props) {
       setError(null);
 
       try {
-        // Try the Supabase view first
-        const { data: viewData, error: viewError } = await supabase
-          .from('resumen_wallet')
-          .select('*')
-          .eq('wallet', wallet.toLowerCase())
-          .single();
-
-        if (viewError && viewError.code !== 'PGRST116') {
-          // PGRST116 = no rows found, which is OK
-          throw viewError;
-        }
-
-        if (viewData) {
-          setSummary(viewData as WalletSummary);
-          return;
-        }
-
-        // Fallback: compute from atestaciones_cache
-        const [receivedResult, emittedResult, userResult] = await Promise.all([
-          supabase
-            .from('atestaciones_cache')
-            .select('score_service, score_treatment, rubro_id')
-            .eq('receiver', wallet.toLowerCase()),
-          supabase
-            .from('atestaciones_cache')
-            .select('score_service, score_treatment, rubro_id')
-            .eq('attester', wallet.toLowerCase()),
-          supabase
-            .from('usuarios')
-            .select('nivel')
-            .eq('wallet', wallet.toLowerCase())
-            .single(),
+        // Fetch attestations and user data via API routes
+        const walletLower = wallet.toLowerCase();
+        const [attRes, userRes] = await Promise.all([
+          fetch(`/api/atestaciones?wallet=${encodeURIComponent(walletLower)}`).then((r) => r.json()),
+          fetch(`/api/usuarios?wallet=${encodeURIComponent(walletLower)}`).then((r) => r.json()).catch(() => ({ usuario: null })),
         ]);
 
-        const received = receivedResult.data || [];
-        const emitted = emittedResult.data || [];
+        const received: Array<{ score_service: number; score_treatment: number; rubro_id: number }> = attRes.received || [];
+        const emitted: Array<{ score_service: number; score_treatment: number; rubro_id: number }> = attRes.emitted || [];
+        const userResult = { data: userRes.usuario };
 
         const allScoresService = received
           .map((r) => r.score_service)

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { supabase } from '@/lib/supabase';
+// supabase replaced with fetch
 import { INTERACTION_TYPES, type Atestacion } from '@/lib/types';
 import {
   ChevronLeft,
@@ -111,29 +111,17 @@ export function AttestationList({ wallet }: Props) {
       try {
         const normalizedWallet = wallet.toLowerCase();
 
-        const [receivedRes, emittedRes, rubrosRes] = await Promise.all([
-          supabase
-            .from('atestaciones_cache')
-            .select('*')
-            .eq('receiver', normalizedWallet)
-            .order('created_at', { ascending: false }),
-          supabase
-            .from('atestaciones_cache')
-            .select('*')
-            .eq('attester', normalizedWallet)
-            .order('created_at', { ascending: false }),
-          supabase.from('rubros').select('id, nombre').eq('activo', true),
+        const [attRes, rubrosRes] = await Promise.all([
+          fetch(`/api/atestaciones?wallet=${encodeURIComponent(normalizedWallet)}`).then((r) => r.json()),
+          fetch('/api/rubros?limit=500').then((r) => r.json()),
         ]);
 
-        if (receivedRes.error) throw receivedRes.error;
-        if (emittedRes.error) throw emittedRes.error;
-
-        setReceived((receivedRes.data || []) as Atestacion[]);
-        setEmitted((emittedRes.data || []) as Atestacion[]);
+        setReceived((attRes.received || []) as Atestacion[]);
+        setEmitted((attRes.emitted || []) as Atestacion[]);
 
         // Build rubro lookup
         const rubroMap: Record<number, string> = {};
-        (rubrosRes.data || []).forEach((r: { id: number; nombre: string }) => {
+        ((rubrosRes.rubros || []) as Array<{ id: number; nombre: string }>).forEach((r) => {
           rubroMap[r.id] = r.nombre;
         });
         setRubros(rubroMap);

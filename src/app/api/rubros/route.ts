@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase';
+import { getPool } from '@/lib/db';
 import rubrosData from '@/config/rubros-seed.json';
 
 // ---------- Types ----------
@@ -33,51 +33,53 @@ export async function GET(request: NextRequest) {
   const offset = Number(searchParams.get('offset') || 0);
 
   try {
-    const supabase = createServiceClient();
+    const pool = getPool();
 
-    // Try Supabase first
-    let query = supabase
-      .from('rubros')
-      .select(`
-        id,
-        nombre,
-        nombre_en,
-        descripcion,
-        activo,
-        created_at,
-        created_by,
-        validation_count,
-        rubro_padres!rubro_id(padre_id)
-      `)
-      .order('id')
-      .range(offset, offset + limit - 1);
+    let queryText = `
+      SELECT
+        r.id,
+        r.nombre,
+        r.nombre_en,
+        r.descripcion,
+        r.activo,
+        r.created_at,
+        r.created_by,
+        r.validation_count,
+        COALESCE(
+          (SELECT array_agg(rp.padre_id ORDER BY rp.padre_id)
+           FROM rubro_padres rp WHERE rp.rubro_id = r.id),
+          '{}'
+        ) AS padres
+      FROM rubros r
+    `;
+    const params: (string | number)[] = [];
 
     if (search) {
-      query = query.ilike('nombre', `%${search}%`);
+      params.push(`%${search}%`);
+      queryText += ` WHERE r.nombre ILIKE $${params.length}`;
     }
 
-    const { data, error } = await query;
+    queryText += ` ORDER BY r.id LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
-    if (!error && data && data.length > 0) {
-      // Map Supabase rows to our Rubro format
-      const rubros: RubroRow[] = data.map((row: Record<string, unknown>) => ({
-        id: row.id as number,
-        nombre: row.nombre as string,
-        nombre_en: row.nombre_en as string | undefined,
-        descripcion: row.descripcion as string | undefined,
-        activo: row.activo as boolean,
-        padres: Array.isArray(row.rubro_padres)
-          ? (row.rubro_padres as Array<{ padre_id: number }>).map((p) => p.padre_id)
-          : [],
-        created_at: row.created_at as string | undefined,
-        created_by: row.created_by as string | undefined,
-        validation_count: row.validation_count as number | undefined,
-      }));
+    const { rows } = await pool.query(queryText, params);
 
-      return NextResponse.json({ rubros, total: rubros.length, source: 'supabase' });
-    }
-  } catch {
-    // Fall through to seed data
+    const rubros: RubroRow[] = rows.map((row) => ({
+      id: row.id,
+      nombre: row.nombre,
+      nombre_en: row.nombre_en,
+      descripcion: row.descripcion,
+      activo: row.activo,
+      padres: row.padres ?? [],
+      created_at: row.created_at,
+      created_by: row.created_by,
+      validation_count: row.validation_count ?? 0,
+    }));
+
+    return NextResponse.json({ rubros, total: rubros.length, source: 'pg' });
+  } catch (e) {
+    console.error('GET /api/rubros error:', e);
+    // Fallback: use seed JSON
   }
 
   // Fallback: use seed JSON
@@ -115,16 +117,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createServiceClient();
+    const pool = getPool();
 
     // Check duplicate
-    const { data: existing } = await supabase
-      .from('rubros')
-      .select('id')
-      .ilike('nombre', nombre.trim())
-      .single();
-
-    if (existing) {
+    const dupCheck = await pool.query(
+      `SELECT id FROM rubros WHERE LOWER(nombre) = LOWER($1) LIMIT 1`,
+      [nombre.trim()]
+    );
+    if (dupCheck.rows.length > 0) {
       return NextResponse.json(
         { error: 'Ya existe un rubro con ese nombre' },
         { status: 409 }
@@ -132,27 +132,31 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert rubro
-    const { data: newRubro, error: insertError } = await supabase
-      .from('rubros')
-      .insert({
-        nombre: nombre.trim(),
-        nombre_en: nombre_en?.trim() || null,
-        descripcion: descripcion?.trim() || null,
-        activo: false, // Pending validation
-        created_by: created_by || null,
-        validation_count: 0,
-      })
-      .select()
-      .single();
+    const insertRes = await pool.query(
+      `INSERT INTO rubros (nombre, nombre_en, descripcion, activo, created_by, validation_count)
+       VALUES ($1, $2, $3, false, $4, 0)
+       RETURNING *`,
+      [
+        nombre.trim(),
+        nombre_en?.trim() || null,
+        descripcion?.trim() || null,
+        created_by || null,
+      ]
+    );
 
-    if (insertError || !newRubro) {
+    const newRubro = insertRes.rows[0];
+    if (!newRubro) {
       return NextResponse.json({ error: 'Error al crear rubro' }, { status: 500 });
     }
 
     // Insert parent relationships
     if (padres.length > 0) {
-      await supabase.from('rubro_padres').insert(
-        padres.map((p: number) => ({ rubro_id: newRubro.id, padre_id: p }))
+      const padreValues = padres
+        .map((_: number, i: number) => `($1, $${i + 2})`)
+        .join(', ');
+      await pool.query(
+        `INSERT INTO rubro_padres (rubro_id, padre_id) VALUES ${padreValues}`,
+        [newRubro.id, ...padres]
       );
     }
 
@@ -173,31 +177,58 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
     }
 
-    const supabase = createServiceClient();
+    const pool = getPool();
 
-    const updateData: Record<string, unknown> = {};
-    if (nombre !== undefined) updateData.nombre = nombre.trim();
-    if (nombre_en !== undefined) updateData.nombre_en = nombre_en?.trim() || null;
-    if (descripcion !== undefined) updateData.descripcion = descripcion?.trim() || null;
-    if (activo !== undefined) updateData.activo = activo;
+    const setClauses: string[] = [];
+    const params: (string | number | boolean | null)[] = [];
 
-    const { data: updated, error } = await supabase
-      .from('rubros')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+    if (nombre !== undefined) {
+      params.push(nombre.trim());
+      setClauses.push(`nombre = $${params.length}`);
+    }
+    if (nombre_en !== undefined) {
+      params.push(nombre_en?.trim() || null);
+      setClauses.push(`nombre_en = $${params.length}`);
+    }
+    if (descripcion !== undefined) {
+      params.push(descripcion?.trim() || null);
+      setClauses.push(`descripcion = $${params.length}`);
+    }
+    if (activo !== undefined) {
+      params.push(activo);
+      setClauses.push(`activo = $${params.length}`);
+    }
 
-    if (error || !updated) {
-      return NextResponse.json({ error: 'Error al actualizar rubro' }, { status: 500 });
+    if (setClauses.length === 0 && padres === undefined) {
+      return NextResponse.json({ error: 'Nada que actualizar' }, { status: 400 });
+    }
+
+    let updated = null;
+    if (setClauses.length > 0) {
+      params.push(id);
+      const { rows } = await pool.query(
+        `UPDATE rubros SET ${setClauses.join(', ')} WHERE id = $${params.length} RETURNING *`,
+        params
+      );
+      updated = rows[0];
+      if (!updated) {
+        return NextResponse.json({ error: 'Error al actualizar rubro' }, { status: 500 });
+      }
+    } else {
+      const { rows } = await pool.query(`SELECT * FROM rubros WHERE id = $1`, [id]);
+      updated = rows[0];
     }
 
     // Update parent relationships if provided
     if (padres !== undefined) {
-      await supabase.from('rubro_padres').delete().eq('rubro_id', id);
+      await pool.query(`DELETE FROM rubro_padres WHERE rubro_id = $1`, [id]);
       if (padres.length > 0) {
-        await supabase.from('rubro_padres').insert(
-          padres.map((p: number) => ({ rubro_id: id, padre_id: p }))
+        const padreValues = padres
+          .map((_: number, i: number) => `($1, $${i + 2})`)
+          .join(', ');
+        await pool.query(
+          `INSERT INTO rubro_padres (rubro_id, padre_id) VALUES ${padreValues}`,
+          [id, ...padres]
         );
       }
     }

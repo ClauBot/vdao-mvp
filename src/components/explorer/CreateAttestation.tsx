@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 // Select components available for future use (currently using custom ScoreSelector)
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { supabase } from '@/lib/supabase';
+// supabase replaced with fetch
 import {
   EAS_CONTRACT_ADDRESS,
   SCHEMA_EVALUATION_UID,
@@ -219,15 +219,17 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
   useEffect(() => {
     if (!open) return;
     setLoadingRubros(true);
-    supabase
-      .from('rubros')
-      .select('*')
-      .eq('activo', true)
-      .order('nombre')
-      .then(({ data, error }) => {
-        if (!error && data) setRubros(data as Rubro[]);
+    fetch('/api/rubros?limit=500')
+      .then((r) => r.json())
+      .then(({ rubros: data }: { rubros: Rubro[] }) => {
+        if (data) {
+          // Sort by nombre client-side
+          const sorted = [...data].sort((a, b) => a.nombre.localeCompare(b.nombre));
+          setRubros(sorted);
+        }
         setLoadingRubros(false);
-      });
+      })
+      .catch(() => setLoadingRubros(false));
   }, [open]);
 
   // Validate receiver address

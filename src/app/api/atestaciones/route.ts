@@ -1,32 +1,19 @@
 /**
  * /api/atestaciones
  *
- * GET  ?wallet=0x... — Fetch attestations for a wallet from Supabase cache
+ * GET  ?wallet=0x... — Fetch attestations for a wallet from pg cache
  *                      (with optional EAS GraphQL fallback for fresh data)
  * POST              — Index a new attestation after on-chain tx confirms
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase';
+import { getPool } from '@/lib/db';
 import { createPublicClient, http, decodeAbiParameters } from 'viem';
 import { arbitrumSepolia } from 'viem/chains';
 import { ARBITRUM_SEPOLIA_RPC, EAS_ADDRESS } from '@/lib/contracts';
 
 // ── EAS GraphQL endpoint for Arbitrum Sepolia ────────────────
 const EAS_GRAPHQL_URL = 'https://arbitrum-sepolia.easscan.org/graphql';
-
-// ── Minimal EAS contract ABI for log decoding ────────────────
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const EAS_ATTESTED_EVENT = {
-  name: 'Attested',
-  type: 'event',
-  inputs: [
-    { name: 'recipient', type: 'address', indexed: true },
-    { name: 'attester', type: 'address', indexed: true },
-    { name: 'uid', type: 'bytes32', indexed: false },
-    { name: 'schemaUID', type: 'bytes32', indexed: true },
-  ],
-} as const;
 
 // ── EAS Schema data decoder ──────────────────────────────────
 function decodeEvaluationSchema(data: `0x${string}`) {
@@ -107,7 +94,7 @@ async function fetchFromEASGraphQL(wallet: string, schemaUID: string) {
       query,
       variables: { wallet, schemaId: schemaUID },
     }),
-    next: { revalidate: 60 }, // Cache for 60s
+    next: { revalidate: 60 },
   });
 
   if (!response.ok) return null;
@@ -148,27 +135,24 @@ export async function GET(request: NextRequest) {
   }
 
   const normalizedWallet = wallet.toLowerCase();
-  const supabase = createServiceClient();
+  const pool = getPool();
 
   try {
-    // 1. Try Supabase cache first
     const [receivedRes, emittedRes] = await Promise.all([
-      supabase
-        .from('atestaciones_cache')
-        .select('*')
-        .eq('receiver', normalizedWallet)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('atestaciones_cache')
-        .select('*')
-        .eq('attester', normalizedWallet)
-        .order('created_at', { ascending: false }),
+      pool.query(
+        `SELECT * FROM atestaciones_cache WHERE receiver = $1 ORDER BY created_at DESC`,
+        [normalizedWallet]
+      ),
+      pool.query(
+        `SELECT * FROM atestaciones_cache WHERE attester = $1 ORDER BY created_at DESC`,
+        [normalizedWallet]
+      ),
     ]);
 
-    const cachedReceived = receivedRes.data || [];
-    const cachedEmitted = emittedRes.data || [];
+    const cachedReceived = receivedRes.rows;
+    const cachedEmitted = emittedRes.rows;
 
-    // 2. If cache is empty AND schema UID is configured, try EAS GraphQL
+    // If cache is empty AND schema UID is configured, try EAS GraphQL
     const schemaUID = process.env.NEXT_PUBLIC_SCHEMA_EVALUATION_UID;
     if (cachedReceived.length === 0 && cachedEmitted.length === 0 && schemaUID) {
       const easData = await fetchFromEASGraphQL(normalizedWallet, schemaUID).catch(
@@ -176,7 +160,6 @@ export async function GET(request: NextRequest) {
       );
 
       if (easData) {
-        // Parse and index new attestations
         const allRaw = [...(easData.received || []), ...(easData.emitted || [])];
 
         const toInsert = allRaw
@@ -204,12 +187,32 @@ export async function GET(request: NextRequest) {
           .filter(Boolean);
 
         if (toInsert.length > 0) {
-          await supabase
-            .from('atestaciones_cache')
-            .upsert(toInsert, { onConflict: 'uid', ignoreDuplicates: true });
+          for (const item of toInsert) {
+            if (!item) continue;
+            await pool
+              .query(
+                `INSERT INTO atestaciones_cache
+                  (uid, attester, receiver, rubro_id, interaction_type, score_service,
+                   score_treatment, role, counterpart_uid, created_at)
+                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+                 ON CONFLICT (uid) DO NOTHING`,
+                [
+                  item.uid,
+                  item.attester,
+                  item.receiver,
+                  item.rubro_id,
+                  item.interaction_type,
+                  item.score_service,
+                  item.score_treatment,
+                  item.role,
+                  item.counterpart_uid,
+                  item.created_at,
+                ]
+              )
+              .catch(() => null);
+          }
         }
 
-        // Return EAS data directly
         return NextResponse.json({
           received: easData.received
             .map((att) => {
@@ -229,7 +232,7 @@ export async function GET(request: NextRequest) {
             })
             .filter(Boolean),
           emitted: easData.emitted
-            .map((att: { id: string; attester: string; recipient: string; schemaId: string; data: string; timeCreated: number; txid: string }) => {
+            .map((att) => {
               const decoded = decodeEvaluationSchema(att.data as `0x${string}`);
               if (!decoded) return null;
               return {
@@ -253,7 +256,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       received: cachedReceived,
       emitted: cachedEmitted,
-      source: 'supabase_cache',
+      source: 'pg_cache',
     });
   } catch (error) {
     console.error('GET /api/atestaciones error:', error);
@@ -263,8 +266,6 @@ export async function GET(request: NextRequest) {
 
 // ─────────────────────────────────────────────────────────────
 // POST /api/atestaciones — Index a new attestation
-// Body: { txHash, attester, receiver, rubroId, interactionType,
-//         scoreService, scoreTreatment, role }
 // ─────────────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   let body: {
@@ -294,12 +295,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = createServiceClient();
+  const pool = getPool();
 
   try {
     let uid = body.uid;
 
-    // If no UID provided, try to get it from the tx receipt
     if (!uid) {
       try {
         const client = createPublicClient({
@@ -311,8 +311,6 @@ export async function POST(request: NextRequest) {
           hash: txHash as `0x${string}`,
         });
 
-        // Find the Attested event in logs
-        // Event topic: keccak256("Attested(address,address,bytes32,bytes32)")
         const ATTESTED_TOPIC =
           '0x8bf46bf4cfd674fa735a3d63ec1c9ad4153f033c290341f3a588b75685141b35';
 
@@ -323,10 +321,8 @@ export async function POST(request: NextRequest) {
         );
 
         if (attestedLog) {
-          // uid is the non-indexed bytes32 in the log data
           uid = attestedLog.data as string;
           if (uid.length > 66) {
-            // data might have extra bytes; take first 32 bytes
             uid = `0x${uid.slice(2, 66)}`;
           }
         }
@@ -335,39 +331,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fallback UID: use txHash if we couldn't extract it
     if (!uid) {
       uid = txHash;
     }
 
-    const record = {
-      uid,
-      attester: attester.toLowerCase(),
-      receiver: receiver.toLowerCase(),
-      rubro_id: rubroId,
-      interaction_type: interactionType,
-      score_service: scoreService,
-      score_treatment: scoreTreatment,
-      role,
-      created_at: new Date().toISOString(),
-    };
-
-    const { error } = await supabase
-      .from('atestaciones_cache')
-      .upsert(record, { onConflict: 'uid', ignoreDuplicates: false });
-
-    if (error) {
-      console.error('Supabase upsert error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    await pool.query(
+      `INSERT INTO atestaciones_cache
+        (uid, attester, receiver, rubro_id, interaction_type, score_service,
+         score_treatment, role, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       ON CONFLICT (uid) DO UPDATE SET
+         attester = EXCLUDED.attester,
+         receiver = EXCLUDED.receiver,
+         rubro_id = EXCLUDED.rubro_id,
+         interaction_type = EXCLUDED.interaction_type,
+         score_service = EXCLUDED.score_service,
+         score_treatment = EXCLUDED.score_treatment,
+         role = EXCLUDED.role`,
+      [
+        uid,
+        attester.toLowerCase(),
+        receiver.toLowerCase(),
+        rubroId,
+        interactionType,
+        scoreService,
+        scoreTreatment,
+        role,
+        new Date().toISOString(),
+      ]
+    );
 
     // Optionally update/create user record
-    await supabase
-      .from('usuarios')
-      .upsert(
-        { wallet: attester.toLowerCase(), nivel: 1 },
-        { onConflict: 'wallet', ignoreDuplicates: true }
-      );
+    await pool
+      .query(
+        `INSERT INTO usuarios (wallet, nivel) VALUES ($1, 1)
+         ON CONFLICT (wallet) DO NOTHING`,
+        [attester.toLowerCase()]
+      )
+      .catch(() => null);
 
     return NextResponse.json({ success: true, uid, indexed: true });
   } catch (error) {
