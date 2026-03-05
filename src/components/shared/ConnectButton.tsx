@@ -29,15 +29,22 @@ export function ConnectButton() {
   const [showConnectors, setShowConnectors] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [siweTriggered, setSiweTriggered] = useState(false);
 
   const isWrongChain = isConnected && chain?.id !== sepolia.id;
 
-  // Auto sign-in with SIWE after wallet connects on correct chain
+  // Reset trigger when disconnecting or changing address
   useEffect(() => {
-    if (isConnected && !isWrongChain && !isAuthenticated && !siweLoading) {
+    setSiweTriggered(false);
+  }, [address]);
+
+  // Auto sign-in with SIWE after wallet connects on correct chain (once)
+  useEffect(() => {
+    if (isConnected && !isWrongChain && !isAuthenticated && !siweLoading && !siweTriggered) {
+      setSiweTriggered(true);
       signIn();
     }
-  }, [isConnected, isWrongChain, isAuthenticated, siweLoading, signIn]);
+  }, [isConnected, isWrongChain, isAuthenticated, siweLoading, siweTriggered, signIn]);
 
   const handleCopyAddress = () => {
     if (address) {

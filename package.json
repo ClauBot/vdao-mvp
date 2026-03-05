@@ -14,7 +14,9 @@
     "seed:attestations": "tsx scripts/seed-mock-attestations.ts",
     "seed:all": "tsx scripts/seed-database.ts",
     "deploy:schemas": "tsx scripts/deploy-schemas.ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@base-org/account": "^2.5.2",
@@ -65,6 +67,7 @@
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }

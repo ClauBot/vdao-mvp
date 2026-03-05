@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { jsonrpc: '2.0', id: null, error: { code: -32603, message: 'Proxy error' } },
       { status: 500 }

@@ -15,8 +15,11 @@ export function useSiwe() {
   const [session, setSession] = useState<SiweSession>({ authenticated: false, wallet: null });
   const [loading, setLoading] = useState(false);
 
-  // Check existing session on mount and when address changes
+  // Check existing session on mount
+  const [checkedOnce, setCheckedOnce] = useState(false);
   useEffect(() => {
+    if (checkedOnce) return;
+    setCheckedOnce(true);
     fetch('/api/auth/session')
       .then((r) => r.json())
       .then((data) => setSession({
@@ -24,7 +27,19 @@ export function useSiwe() {
         wallet: data.wallet ?? null,
       }))
       .catch(() => setSession({ authenticated: false, wallet: null }));
-  }, [address]);
+  }, [checkedOnce]);
+
+  // If address changes (different wallet), reset session
+  const [prevAddress, setPrevAddress] = useState(address);
+  useEffect(() => {
+    if (address !== prevAddress) {
+      setPrevAddress(address);
+      if (address) {
+        // Different wallet connected — need to re-auth
+        setSession({ authenticated: false, wallet: null });
+      }
+    }
+  }, [address, prevAddress]);
 
   const signIn = useCallback(async () => {
     if (!address || !isConnected) return;

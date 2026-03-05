@@ -10,7 +10,6 @@ import {
 import { privateKeyToAccount } from 'viem/accounts';
 import { sepolia } from 'viem/chains';
 import { SEPOLIA_RPC } from '@/lib/contracts';
-import { SCHEMA_EVALUATION_UID } from '@/lib/eas';
 import { applyRateLimit } from '@/lib/api-guard';
 import { isValidWallet } from '@/lib/sanitize';
 import {
