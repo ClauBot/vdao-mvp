@@ -1,44 +1,33 @@
 /**
  * Browser-side Paymaster Helper
  *
- * Extends paymaster.ts to work with wagmi WalletClients (browser wallets like MetaMask).
- * While paymaster.ts is designed for LocalAccounts (private keys),
- * this module handles the EIP-4337 flow for connected browser wallets.
+ * Uses /api/paymaster proxy to talk to Pimlico.
+ * The API key never leaves the server.
  */
 
 import { createSmartAccountClient } from 'permissionless';
 import { toSimpleSmartAccount } from 'permissionless/accounts';
+import { createPimlicoClient } from 'permissionless/clients/pimlico';
 import { http, type WalletClient } from 'viem';
 import { sepolia } from "viem/chains";
-import {
-  publicClient,
-  ENTRYPOINT_V07,
-  createPimlicoSponsorClient,
-} from './paymaster';
+import { publicClient, ENTRYPOINT_V07 } from './paymaster';
 
 const SIMPLE_ACCOUNT_FACTORY = '0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985' as const;
-const PIMLICO_API_KEY = process.env.NEXT_PUBLIC_PIMLICO_API_KEY || '';
 
-function getPimlicoRpc(): string {
-  return `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}`;
+// Use the backend proxy instead of Pimlico directly
+function getProxyRpc(): string {
+  return '/api/paymaster';
 }
 
 /**
  * Creates a gasless smart account client from a wagmi WalletClient.
- *
- * permissionless v0.3's toSimpleSmartAccount() accepts WalletClient as owner,
- * allowing browser wallets (MetaMask, WalletConnect, etc.) to create ERC-4337 accounts.
- *
- * The user signs the UserOperation via their browser wallet,
- * but pays NO gas — Pimlico's paymaster sponsors it.
+ * All Pimlico communication goes through /api/paymaster (server-side proxy).
  */
 export async function createGaslessClientFromWalletClient(walletClient: WalletClient) {
-  const pimlicoRpc = getPimlicoRpc();
+  const proxyRpc = getProxyRpc();
 
-  // Create the Simple Smart Account using the browser wallet as owner
   const smartAccount = await toSimpleSmartAccount({
     client: publicClient,
-    // permissionless v0.3 accepts WalletClient as owner
     owner: walletClient as Parameters<typeof toSimpleSmartAccount>[0]['owner'],
     factoryAddress: SIMPLE_ACCOUNT_FACTORY,
     entryPoint: {
@@ -47,12 +36,19 @@ export async function createGaslessClientFromWalletClient(walletClient: WalletCl
     },
   });
 
-  const pimlicoClient = createPimlicoSponsorClient();
+  const pimlicoClient = createPimlicoClient({
+    transport: http(proxyRpc),
+    chain: sepolia,
+    entryPoint: {
+      address: ENTRYPOINT_V07,
+      version: '0.7',
+    },
+  });
 
   const smartAccountClient = createSmartAccountClient({
     account: smartAccount,
     chain: sepolia,
-    bundlerTransport: http(pimlicoRpc),
+    bundlerTransport: http(proxyRpc),
     paymaster: pimlicoClient,
     userOperation: {
       estimateFeesPerGas: async () => {

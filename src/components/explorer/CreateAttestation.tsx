@@ -21,7 +21,7 @@ import {
   EAS_CONTRACT_ADDRESS,
   SCHEMA_EVALUATION_UID,
 } from '@/lib/eas';
-import { isPaymasterAvailable } from '@/lib/paymaster';
+import { checkPaymasterAvailable } from '@/lib/paymaster';
 import { INTERACTION_TYPES, ROLE_LABELS, SCORE_LABELS, type Rubro } from '@/lib/types';
 import {
   encodeFunctionData,
@@ -197,9 +197,15 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
   const publicClient = usePublicClient();
 
   const [open, setOpen] = useState(false);
+  const [paymasterAvailable, setPaymasterAvailable] = useState(false);
   const [rubros, setRubros] = useState<Rubro[]>([]);
   const [rubroSearch, setRubroSearch] = useState('');
   const [loadingRubros, setLoadingRubros] = useState(false);
+
+  // Check paymaster availability on mount
+  useEffect(() => {
+    checkPaymasterAvailable().then(setPaymasterAvailable);
+  }, []);
 
   const [form, setForm] = useState<FormState>({
     receiver: prefillReceiver || '',
@@ -314,7 +320,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
       let hash: `0x${string}`;
 
       // 3a. Gasless path (if Pimlico configured)
-      if (isPaymasterAvailable()) {
+      if (paymasterAvailable) {
         // Dynamic import to avoid issues when Pimlico is not configured
         const { createGaslessClientFromWalletClient } = await import(
           '@/lib/paymaster-browser'
@@ -410,7 +416,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
       <Button onClick={() => setOpen(true)} className="gap-2">
         <Star className="h-4 w-4" />
         Evaluar
-        {isPaymasterAvailable() && (
+        {paymasterAvailable && (
           <span className="ml-0.5">
             <Zap className="h-3 w-3 text-yellow-400" />
           </span>
@@ -447,7 +453,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   Crear Atestación
-                  {isPaymasterAvailable() && (
+                  {paymasterAvailable && (
                     <Badge variant="secondary" className="gap-1 text-xs">
                       <Zap className="h-3 w-3 text-yellow-500" /> Sin gas
                     </Badge>

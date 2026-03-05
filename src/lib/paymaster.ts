@@ -63,7 +63,8 @@ const SIMPLE_ACCOUNT_FACTORY = '0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985' as c
 // Configuration
 // ============================================================
 
-const PIMLICO_API_KEY = process.env.NEXT_PUBLIC_PIMLICO_API_KEY || '';
+// Server-side: read key directly from env (never exposed to browser)
+const PIMLICO_API_KEY = process.env.PIMLICO_API_KEY || '';
 
 function getPimlicoRpc() {
   if (!PIMLICO_API_KEY) return '';
@@ -71,11 +72,25 @@ function getPimlicoRpc() {
 }
 
 /**
- * Whether the paymaster is configured and available.
- * Returns true when NEXT_PUBLIC_PIMLICO_API_KEY is set.
+ * Whether the paymaster is configured (server-side check).
+ * For browser-side, use checkPaymasterAvailable() which calls /api/paymaster.
  */
 export function isPaymasterAvailable(): boolean {
   return Boolean(PIMLICO_API_KEY);
+}
+
+/**
+ * Browser-safe check: calls /api/paymaster GET to see if paymaster is configured.
+ * Use this in client components instead of isPaymasterAvailable().
+ */
+export async function checkPaymasterAvailable(): Promise<boolean> {
+  try {
+    const res = await fetch('/api/paymaster');
+    const data = await res.json();
+    return data.available === true;
+  } catch {
+    return false;
+  }
 }
 
 // ============================================================

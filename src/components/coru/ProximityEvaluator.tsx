@@ -33,7 +33,7 @@ import {
   EAS_CONTRACT_ADDRESS,
   SCHEMA_PROXIMITY_UID,
 } from '@/lib/eas';
-import { isPaymasterAvailable } from '@/lib/paymaster';
+// Paymaster availability is not critical here — just used for UI label
 
 // ---------- Types ----------
 interface TxResult {
@@ -210,7 +210,7 @@ export function ProximityEvaluator({
           }),
         });
 
-        txResults.push({ success: true, uid, wasGasless: isPaymasterAvailable() });
+        txResults.push({ success: true, uid, wasGasless: false });
       } catch (e) {
         const err = e as Error;
         txResults.push({

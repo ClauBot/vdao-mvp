@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
+import { applyRateLimit } from '@/lib/api-guard';
+import { isValidWallet } from '@/lib/sanitize';
 import proximidadesData from '@/config/proximidades-seed.json';
 
 interface SeedProximidad {
@@ -17,6 +19,9 @@ const SEED_WEIGHT = 10;
 
 // ---------- GET /api/proximidades ----------
 export async function GET(request: NextRequest) {
+  const blocked = applyRateLimit(request);
+  if (blocked) return blocked;
+
   const { searchParams } = new URL(request.url);
   const rubroA = searchParams.get('rubro_a');
   const rubroB = searchParams.get('rubro_b');
@@ -70,12 +75,19 @@ export async function GET(request: NextRequest) {
 // ---------- POST /api/proximidades ----------
 // Called after an EAS proximity attestation is created on-chain
 export async function POST(request: NextRequest) {
+  const blocked = applyRateLimit(request);
+  if (blocked) return blocked;
+
   try {
     const body = await request.json();
     const { rubro_a, rubro_b, score, proposer, proposer_level, uid } = body;
 
     if (!rubro_a || !rubro_b || !score || !proposer) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
+    }
+
+    if (!isValidWallet(proposer)) {
+      return NextResponse.json({ error: 'Formato de wallet inválido' }, { status: 400 });
     }
 
     const level = Math.min(4, Math.max(1, Number(proposer_level) || 1)) as 1 | 2 | 3 | 4;

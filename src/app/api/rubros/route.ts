@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
+import { requireAuth } from '@/lib/auth';
+import { applyRateLimit } from '@/lib/api-guard';
+import { sanitizeRubroName, sanitizeDescription } from '@/lib/sanitize';
 import rubrosData from '@/config/rubros-seed.json';
 
 // ---------- Types ----------
@@ -37,6 +40,9 @@ async function getUserLevel(pool: ReturnType<typeof getPool>, wallet?: string): 
 
 // ---------- GET /api/rubros ----------
 export async function GET(request: NextRequest) {
+  const blocked = applyRateLimit(request);
+  if (blocked) return blocked;
+
   const { searchParams } = new URL(request.url);
   const search = searchParams.get('search') || '';
   const limit = Number(searchParams.get('limit') || 200);
@@ -126,13 +132,34 @@ export async function GET(request: NextRequest) {
 
 // ---------- POST /api/rubros (nivel 2+) ----------
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { nombre, nombre_en, descripcion, padres = [], created_by } = body;
+  const blocked = applyRateLimit(request);
+  if (blocked) return blocked;
 
-    if (!nombre || nombre.trim().length < 3) {
+  try {
+    // Auth: verify session
+    const wallet = await requireAuth();
+    if (!wallet) {
       return NextResponse.json(
-        { error: 'El nombre debe tener al menos 3 caracteres' },
+        { error: 'Autenticación requerida. Firma con tu wallet primero.' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { nombre, nombre_en, descripcion, padres = [] } = body;
+
+    const cleanNombre = sanitizeRubroName(nombre);
+    if (!cleanNombre) {
+      return NextResponse.json(
+        { error: 'El nombre debe tener entre 3 y 200 caracteres' },
+        { status: 400 }
+      );
+    }
+
+    const cleanDesc = descripcion ? sanitizeDescription(descripcion) : null;
+    if (descripcion && cleanDesc === null) {
+      return NextResponse.json(
+        { error: 'La descripción no puede exceder 1000 caracteres' },
         { status: 400 }
       );
     }
@@ -140,7 +167,7 @@ export async function POST(request: NextRequest) {
     const pool = getPool();
 
     // Level check: requires nivel 2+
-    const level = await getUserLevel(pool, created_by);
+    const level = await getUserLevel(pool, wallet);
     if (level < 2) {
       return NextResponse.json(
         { error: 'Se requiere nivel 2+ para proponer rubros' },
@@ -151,7 +178,7 @@ export async function POST(request: NextRequest) {
     // Check duplicate
     const dupCheck = await pool.query(
       `SELECT id FROM rubros WHERE LOWER(nombre) = LOWER($1) LIMIT 1`,
-      [nombre.trim()]
+      [cleanNombre]
     );
     if (dupCheck.rows.length > 0) {
       return NextResponse.json(
@@ -166,10 +193,10 @@ export async function POST(request: NextRequest) {
        VALUES ($1, $2, $3, false, $4, 0)
        RETURNING *`,
       [
-        nombre.trim(),
+        cleanNombre,
         nombre_en?.trim() || null,
-        descripcion?.trim() || null,
-        created_by || null,
+        cleanDesc ?? null,
+        wallet,
       ]
     );
 
@@ -198,9 +225,21 @@ export async function POST(request: NextRequest) {
 
 // ---------- PATCH /api/rubros (nivel 4) ----------
 export async function PATCH(request: NextRequest) {
+  const blocked = applyRateLimit(request);
+  if (blocked) return blocked;
+
   try {
+    // Auth: verify session
+    const wallet = await requireAuth();
+    if (!wallet) {
+      return NextResponse.json(
+        { error: 'Autenticación requerida. Firma con tu wallet primero.' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
-    const { id, nombre, nombre_en, descripcion, padres, activo, wallet } = body;
+    const { id, nombre, nombre_en, descripcion, padres, activo } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
@@ -221,7 +260,14 @@ export async function PATCH(request: NextRequest) {
     const params: (string | number | boolean | null)[] = [];
 
     if (nombre !== undefined) {
-      params.push(nombre.trim());
+      const cleanN = sanitizeRubroName(nombre);
+      if (!cleanN) {
+        return NextResponse.json(
+          { error: 'El nombre debe tener entre 3 y 200 caracteres' },
+          { status: 400 }
+        );
+      }
+      params.push(cleanN);
       setClauses.push(`nombre = $${params.length}`);
     }
     if (nombre_en !== undefined) {
@@ -229,7 +275,14 @@ export async function PATCH(request: NextRequest) {
       setClauses.push(`nombre_en = $${params.length}`);
     }
     if (descripcion !== undefined) {
-      params.push(descripcion?.trim() || null);
+      const cleanD = descripcion ? sanitizeDescription(descripcion) : null;
+      if (descripcion && cleanD === null) {
+        return NextResponse.json(
+          { error: 'La descripción no puede exceder 1000 caracteres' },
+          { status: 400 }
+        );
+      }
+      params.push(cleanD);
       setClauses.push(`descripcion = $${params.length}`);
     }
     if (activo !== undefined) {

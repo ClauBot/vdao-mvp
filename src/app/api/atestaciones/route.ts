@@ -8,9 +8,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
+import { applyRateLimit } from '@/lib/api-guard';
 import { createPublicClient, http, decodeAbiParameters } from 'viem';
 import { sepolia } from "viem/chains";
 import { SEPOLIA_RPC, EAS_ADDRESS } from '@/lib/contracts';
+import { isValidWallet } from '@/lib/sanitize';
 
 // ── EAS GraphQL endpoint for Sepolia ────────────────
 const EAS_GRAPHQL_URL = 'https://sepolia.easscan.org/graphql';
@@ -125,6 +127,9 @@ async function fetchFromEASGraphQL(wallet: string, schemaUID: string) {
 // GET /api/atestaciones?wallet=0x...
 // ─────────────────────────────────────────────────────────────
 export async function GET(request: NextRequest) {
+  const blocked = applyRateLimit(request);
+  if (blocked) return blocked;
+
   const wallet = request.nextUrl.searchParams.get('wallet');
   const rubroId = request.nextUrl.searchParams.get('rubro_id');
   const countOnly = request.nextUrl.searchParams.get('count_only');
@@ -306,6 +311,9 @@ export async function GET(request: NextRequest) {
 // POST /api/atestaciones — Index a new attestation
 // ─────────────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
+  const blocked = applyRateLimit(request);
+  if (blocked) return blocked;
+
   let body: {
     txHash: string;
     attester: string;
@@ -329,6 +337,13 @@ export async function POST(request: NextRequest) {
   if (!txHash || !attester || !receiver) {
     return NextResponse.json(
       { error: 'Campos requeridos: txHash, attester, receiver' },
+      { status: 400 }
+    );
+  }
+
+  if (!isValidWallet(attester) || !isValidWallet(receiver)) {
+    return NextResponse.json(
+      { error: 'Formato de wallet inválido' },
       { status: 400 }
     );
   }

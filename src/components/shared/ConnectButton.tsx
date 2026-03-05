@@ -1,10 +1,11 @@
 'use client';
 
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { sepolia } from "wagmi/chains";;
-import { useState } from 'react';
+import { sepolia } from "wagmi/chains";
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Wallet, ChevronDown, LogOut, Copy, Check, AlertTriangle } from 'lucide-react';
+import { Loader2, Wallet, ChevronDown, LogOut, Copy, Check, AlertTriangle, Shield } from 'lucide-react';
+import { useSiwe } from '@/hooks/useSiwe';
 
 function truncateAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -24,11 +25,19 @@ export function ConnectButton() {
   const { disconnect } = useDisconnect();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
 
+  const { isAuthenticated, signIn, signOut, loading: siweLoading } = useSiwe();
   const [showConnectors, setShowConnectors] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const isWrongChain = isConnected && chain?.id !== sepolia.id;
+
+  // Auto sign-in with SIWE after wallet connects on correct chain
+  useEffect(() => {
+    if (isConnected && !isWrongChain && !isAuthenticated && !siweLoading) {
+      signIn();
+    }
+  }, [isConnected, isWrongChain, isAuthenticated, siweLoading, signIn]);
 
   const handleCopyAddress = () => {
     if (address) {
@@ -83,10 +92,25 @@ export function ConnectButton() {
             {/* Dropdown */}
             <div className="absolute right-0 top-full mt-1 z-20 w-56 rounded-md border border-neutral-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
               <div className="p-2">
-                {/* Chain indicator */}
-                <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-                  <span className="h-2 w-2 rounded-full bg-green-400" />
-                  Sepolia
+                {/* Chain + auth indicator */}
+                <div className="flex items-center justify-between px-2 py-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-green-400" />
+                    Sepolia
+                  </div>
+                  {isAuthenticated ? (
+                    <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                      <Shield className="h-3 w-3" />
+                      Verified
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => { signIn(); setShowMenu(false); }}
+                      className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    >
+                      Sign In
+                    </button>
+                  )}
                 </div>
 
                 <hr className="my-1 border-neutral-200 dark:border-neutral-800" />
@@ -124,6 +148,7 @@ export function ConnectButton() {
                 {/* Disconnect */}
                 <button
                   onClick={() => {
+                    signOut();
                     disconnect();
                     setShowMenu(false);
                   }}
