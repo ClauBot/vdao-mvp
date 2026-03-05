@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
   try {
     const pool = getPool();
     const { rows } = await pool.query(
-      `SELECT wallet, nivel, nombre_display, created_at FROM usuarios WHERE wallet = $1`,
-      [wallet.toLowerCase()]
+      `SELECT wallet, nivel, nombre_display, created_at FROM usuarios WHERE LOWER(wallet) = LOWER($1)`,
+      [wallet]
     );
 
     if (rows.length === 0) {

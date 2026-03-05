@@ -97,7 +97,7 @@ export function AttestationCard({ attestation, rubroNombre, viewMode }: Props) {
   const counterpartyLabel = viewMode === 'received' ? 'Evaluado por' : 'Evaluado a';
 
   const easExplorerUrl = `https://sepolia.easscan.org/attestation/view/${attestation.uid}`;
-  const arbiscanUrl = `https://sepolia.arbiscan.io/address/${counterparty}`;
+  const etherscanUrl = `https://sepolia.etherscan.io/address/${counterparty}`;
 
   return (
     <div className="rounded-lg border border-border bg-card p-4 hover:border-border/80 hover:shadow-sm transition-all space-y-3">
@@ -107,7 +107,7 @@ export function AttestationCard({ attestation, rubroNombre, viewMode }: Props) {
           <p className="text-xs text-muted-foreground">{counterpartyLabel}</p>
           <div className="flex items-center gap-1">
             <a
-              href={arbiscanUrl}
+              href={etherscanUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="font-mono text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-0.5 truncate"

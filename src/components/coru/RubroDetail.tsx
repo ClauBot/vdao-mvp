@@ -53,6 +53,7 @@ export function RubroDetail({
   isConnected,
 }: RubroDetailProps) {
   const [attestationCount, setAttestationCount] = useState<number | null>(null);
+  const [topWallets, setTopWallets] = useState<Array<{ wallet: string; avg_score: number; count: number }>>([]);
 
   const rubroById = useMemo(() => {
     const m = new Map<number, Rubro>();
@@ -66,14 +67,20 @@ export function RubroDetail({
     return m;
   }, [rubros]);
 
-  // Fetch attestation count for this rubro
+  // Fetch attestation count and top wallets for this rubro
   useEffect(() => {
     if (!rubro) return;
     setAttestationCount(null);
-    // NOTE: Fetch real count from /api/atestaciones?rubro_id=X once indexer is running.
-    // Mocked for MVP demo; seed with `pnpm seed:attestations` to populate cache.
-    setAttestationCount(Math.floor(Math.random() * 20));
-  }, [rubro]); // eslint-disable-line react-hooks/exhaustive-deps
+    setTopWallets([]);
+    fetch(`/api/atestaciones?rubro_id=${rubro.id}&count_only=true`)
+      .then((res) => res.json())
+      .then((data) => setAttestationCount(data.count ?? 0))
+      .catch(() => setAttestationCount(0));
+    fetch(`/api/atestaciones?rubro_id=${rubro.id}&top_wallets=true`)
+      .then((res) => res.json())
+      .then((data) => setTopWallets(data.wallets ?? []))
+      .catch(() => setTopWallets([]));
+  }, [rubro]);
 
   const parents = useMemo(() => {
     if (!rubro) return [];
@@ -247,34 +254,33 @@ export function RubroDetail({
               </div>
             </div>
 
-            {/* Mock: Top wallets */}
+            {/* Top wallets */}
             <div>
               <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
                 <Users className="h-4 w-4" />
                 Top Wallets en este Rubro
               </h3>
-              <div className="space-y-2">
-                {[
-                  { wallet: '0x1234...5678', score: 4.8, count: 12 },
-                  { wallet: '0xabcd...ef01', score: 4.5, count: 8 },
-                  { wallet: '0x9876...5432', score: 4.2, count: 5 },
-                ].map((w, i) => (
-                  <div key={w.wallet} className="flex items-center gap-3 py-1.5">
-                    <span className="text-xs text-neutral-400 w-5 text-right">{i + 1}.</span>
-                    <span className="font-mono text-sm text-neutral-700 dark:text-neutral-300 flex-1">
-                      {w.wallet}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <Award className="h-3.5 w-3.5 text-yellow-500" />
-                      <span className="text-sm font-medium">{w.score}</span>
+              {topWallets.length > 0 ? (
+                <div className="space-y-2">
+                  {topWallets.map((w, i) => (
+                    <div key={w.wallet} className="flex items-center gap-3 py-1.5">
+                      <span className="text-xs text-neutral-400 w-5 text-right">{i + 1}.</span>
+                      <span className="font-mono text-sm text-neutral-700 dark:text-neutral-300 flex-1 truncate">
+                        {w.wallet.slice(0, 6)}...{w.wallet.slice(-4)}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <Award className="h-3.5 w-3.5 text-yellow-500" />
+                        <span className="text-sm font-medium">{w.avg_score}</span>
+                      </div>
+                      <span className="text-xs text-neutral-500">{w.count} atestaciones</span>
                     </div>
-                    <span className="text-xs text-neutral-500">{w.count} atestaciones</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-neutral-400 mt-2 italic">
-                * Datos de ejemplo. Conectar Supabase para datos reales.
-              </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-neutral-400 italic">
+                  Sin atestaciones en este rubro aún.
+                </p>
+              )}
             </div>
           </div>
         </ScrollArea>

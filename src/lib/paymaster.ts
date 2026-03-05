@@ -46,8 +46,8 @@ import {
   type Account,
   type LocalAccount,
 } from 'viem';
-import { sepolia } from "viem/chains";;
-import { ARBITRUM_SEPOLIA_RPC } from './contracts';
+import { sepolia } from "viem/chains";
+import { SEPOLIA_RPC } from './contracts';
 
 // ============================================================
 // ERC-4337 Entrypoint Addresses
@@ -85,7 +85,7 @@ export function isPaymasterAvailable(): boolean {
 /** Read-only public client for Sepolia */
 export const publicClient = createPublicClient({
   chain: sepolia,
-  transport: http(ARBITRUM_SEPOLIA_RPC),
+  transport: http(SEPOLIA_RPC),
 });
 
 // ============================================================
@@ -211,7 +211,7 @@ export async function sendDirectTransaction(
     const walletClient = createWalletClient({
       account,
       chain: sepolia,
-      transport: http(ARBITRUM_SEPOLIA_RPC),
+      transport: http(SEPOLIA_RPC),
     });
 
     const hash = await walletClient.sendTransaction({ to, data, value, account });

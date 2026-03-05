@@ -107,16 +107,16 @@ export function ConnectButton() {
                   {copied ? 'Copied!' : 'Copy Address'}
                 </button>
 
-                {/* Arbiscan link */}
+                {/* Etherscan link */}
                 <a
-                  href={`https://sepolia.arbiscan.io/address/${address}`}
+                  href={`https://sepolia.etherscan.io/address/${address}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                   onClick={() => setShowMenu(false)}
                 >
                   <Wallet className="h-4 w-4" />
-                  View on Arbiscan
+                  View on Etherscan
                 </a>
 
                 <hr className="my-1 border-neutral-200 dark:border-neutral-800" />

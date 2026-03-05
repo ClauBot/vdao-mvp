@@ -38,7 +38,7 @@ export function ExplorerDashboard({ wallet }: Props) {
   }
 
   const normalizedWallet = wallet.toLowerCase() as `0x${string}`;
-  const arbiscanUrl = `https://sepolia.arbiscan.io/address/${normalizedWallet}`;
+  const etherscanUrl = `https://sepolia.etherscan.io/address/${normalizedWallet}`;
 
   return (
     <div className="space-y-6">
@@ -51,12 +51,12 @@ export function ExplorerDashboard({ wallet }: Props) {
               {truncateAddress(normalizedWallet)}
             </p>
             <a
-              href={arbiscanUrl}
+              href={etherscanUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Ver en Arbiscan <ArrowUpRight className="h-3 w-3" />
+              Ver en Etherscan <ArrowUpRight className="h-3 w-3" />
             </a>
           </div>
         </div>

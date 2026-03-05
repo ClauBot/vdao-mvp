@@ -25,6 +25,16 @@ interface SeedRubro {
   activo: boolean;
 }
 
+// ---------- Helpers ----------
+async function getUserLevel(pool: ReturnType<typeof getPool>, wallet?: string): Promise<number> {
+  if (!wallet) return 0;
+  const { rows } = await pool.query(
+    `SELECT nivel FROM usuarios WHERE LOWER(wallet) = LOWER($1)`,
+    [wallet]
+  );
+  return rows[0]?.nivel ?? 0;
+}
+
 // ---------- GET /api/rubros ----------
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -64,6 +74,16 @@ export async function GET(request: NextRequest) {
 
     const { rows } = await pool.query(queryText, params);
 
+    // Count total (without limit/offset)
+    let countQuery = `SELECT COUNT(*) FROM rubros r`;
+    const countParams: string[] = [];
+    if (search) {
+      countParams.push(`%${search}%`);
+      countQuery += ` WHERE r.nombre ILIKE $1`;
+    }
+    const countRes = await pool.query(countQuery, countParams);
+    const total = parseInt(countRes.rows[0].count, 10);
+
     const rubros: RubroRow[] = rows.map((row) => ({
       id: row.id,
       nombre: row.nombre,
@@ -76,7 +96,7 @@ export async function GET(request: NextRequest) {
       validation_count: row.validation_count ?? 0,
     }));
 
-    return NextResponse.json({ rubros, total: rubros.length, source: 'pg' });
+    return NextResponse.json({ rubros, total, source: 'pg' });
   } catch (e) {
     console.error('GET /api/rubros error:', e);
     // Fallback: use seed JSON
@@ -104,7 +124,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ rubros, total: filtered.length, source: 'seed' });
 }
 
-// ---------- POST /api/rubros ----------
+// ---------- POST /api/rubros (nivel 2+) ----------
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -118,6 +138,15 @@ export async function POST(request: NextRequest) {
     }
 
     const pool = getPool();
+
+    // Level check: requires nivel 2+
+    const level = await getUserLevel(pool, created_by);
+    if (level < 2) {
+      return NextResponse.json(
+        { error: 'Se requiere nivel 2+ para proponer rubros' },
+        { status: 403 }
+      );
+    }
 
     // Check duplicate
     const dupCheck = await pool.query(
@@ -167,17 +196,26 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ---------- PATCH /api/rubros ----------
+// ---------- PATCH /api/rubros (nivel 4) ----------
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, nombre, nombre_en, descripcion, padres, activo } = body;
+    const { id, nombre, nombre_en, descripcion, padres, activo, wallet } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
     }
 
     const pool = getPool();
+
+    // Level check: requires nivel 4
+    const level = await getUserLevel(pool, wallet);
+    if (level < 4) {
+      return NextResponse.json(
+        { error: 'Se requiere nivel 4 para editar rubros' },
+        { status: 403 }
+      );
+    }
 
     const setClauses: string[] = [];
     const params: (string | number | boolean | null)[] = [];

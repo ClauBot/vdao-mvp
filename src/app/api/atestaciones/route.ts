@@ -9,8 +9,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { createPublicClient, http, decodeAbiParameters } from 'viem';
-import { sepolia } from "viem/chains";;
-import { ARBITRUM_SEPOLIA_RPC, EAS_ADDRESS } from '@/lib/contracts';
+import { sepolia } from "viem/chains";
+import { SEPOLIA_RPC, EAS_ADDRESS } from '@/lib/contracts';
 
 // ── EAS GraphQL endpoint for Sepolia ────────────────
 const EAS_GRAPHQL_URL = 'https://sepolia.easscan.org/graphql';
@@ -126,6 +126,44 @@ async function fetchFromEASGraphQL(wallet: string, schemaUID: string) {
 // ─────────────────────────────────────────────────────────────
 export async function GET(request: NextRequest) {
   const wallet = request.nextUrl.searchParams.get('wallet');
+  const rubroId = request.nextUrl.searchParams.get('rubro_id');
+  const countOnly = request.nextUrl.searchParams.get('count_only');
+
+  // Count attestations by rubro_id
+  if (rubroId && countOnly) {
+    try {
+      const pool = getPool();
+      const { rows } = await pool.query(
+        `SELECT COUNT(*) FROM atestaciones_cache WHERE rubro_id = $1`,
+        [parseInt(rubroId, 10)]
+      );
+      return NextResponse.json({ count: parseInt(rows[0].count, 10) });
+    } catch {
+      return NextResponse.json({ count: 0 });
+    }
+  }
+
+  // Top wallets by rubro_id
+  const topWallets = request.nextUrl.searchParams.get('top_wallets');
+  if (rubroId && topWallets) {
+    try {
+      const pool = getPool();
+      const { rows } = await pool.query(
+        `SELECT receiver AS wallet,
+                ROUND(AVG((score_service + score_treatment) / 2.0)::numeric, 1) AS avg_score,
+                COUNT(*) AS count
+         FROM atestaciones_cache
+         WHERE rubro_id = $1
+         GROUP BY receiver
+         ORDER BY avg_score DESC, count DESC
+         LIMIT 5`,
+        [parseInt(rubroId, 10)]
+      );
+      return NextResponse.json({ wallets: rows });
+    } catch {
+      return NextResponse.json({ wallets: [] });
+    }
+  }
 
   if (!wallet) {
     return NextResponse.json(
@@ -304,7 +342,7 @@ export async function POST(request: NextRequest) {
       try {
         const client = createPublicClient({
           chain: sepolia,
-          transport: http(ARBITRUM_SEPOLIA_RPC),
+          transport: http(SEPOLIA_RPC),
         });
 
         const receipt = await client.getTransactionReceipt({

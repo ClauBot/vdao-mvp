@@ -62,16 +62,25 @@ export function useProximidades() {
 }
 
 // ---------- useUserLevel ----------
-// In MVP we derive level from on-chain data or default to 1
 export function useUserLevel(wallet?: string): 1 | 2 | 3 | 4 {
   const [level, setLevel] = useState<1 | 2 | 3 | 4>(1);
 
   useEffect(() => {
     if (!wallet) return;
-    // NOTE: Fetch user level from Supabase `usuarios` table.
-    // Seed test users with `pnpm seed:users` to populate levels.
-    // Until a real lookup is implemented, defaults to level 1.
-    setLevel(1);
+    async function fetchLevel() {
+      try {
+        const res = await fetch(`/api/usuarios?wallet=${wallet}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.usuario?.nivel) {
+          const n = Math.min(4, Math.max(1, data.usuario.nivel)) as 1 | 2 | 3 | 4;
+          setLevel(n);
+        }
+      } catch {
+        // Keep default level 1
+      }
+    }
+    fetchLevel();
   }, [wallet]);
 
   return level;

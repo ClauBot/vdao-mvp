@@ -3,15 +3,33 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Search, Network, Shield, Zap, CheckCircle, Users, FileText } from 'lucide-react';
+import { getPool } from '@/lib/db';
 
-// Placeholder stats — replace with real Supabase queries once connected
-const STATS = [
-  { label: 'Atestaciones', value: '—', icon: FileText },
-  { label: 'Rubros', value: '152', icon: Network },
-  { label: 'Usuarios', value: '—', icon: Users },
-];
+async function getStats() {
+  try {
+    const pool = getPool();
+    const [rubros, atestaciones, usuarios] = await Promise.all([
+      pool.query('SELECT COUNT(*) FROM rubros WHERE activo = true'),
+      pool.query('SELECT COUNT(*) FROM atestaciones_cache'),
+      pool.query('SELECT COUNT(*) FROM usuarios'),
+    ]);
+    return {
+      rubros: rubros.rows[0].count,
+      atestaciones: atestaciones.rows[0].count,
+      usuarios: usuarios.rows[0].count,
+    };
+  } catch {
+    return { rubros: '—', atestaciones: '—', usuarios: '—' };
+  }
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const stats = await getStats();
+  const STATS = [
+    { label: 'Atestaciones', value: stats.atestaciones, icon: FileText },
+    { label: 'Rubros', value: stats.rubros, icon: Network },
+    { label: 'Usuarios', value: stats.usuarios, icon: Users },
+  ];
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* ── Hero ──────────────────────────────────────────── */}

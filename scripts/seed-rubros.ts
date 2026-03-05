@@ -1,26 +1,26 @@
 /**
  * VDAO MVP — Seed: Rubros
- * Loads ~152 rubros from src/config/rubros-seed.json into Supabase.
+ * Loads ~152 rubros from src/config/rubros-seed.json into PostgreSQL.
  *
  * Usage:
- *   export SUPABASE_URL=https://xxx.supabase.co
- *   export SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
  *   npx tsx scripts/seed-rubros.ts
+ *   (reads DATABASE_URL from .env.local)
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { Pool } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+dotenv.config({ path: path.join(__dirname, '../.env.local') });
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('❌  Missing env vars: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error('Missing DATABASE_URL in .env.local');
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const pool = new Pool({ connectionString: DATABASE_URL });
 
 interface RubroSeed {
   id: number;
@@ -32,63 +32,58 @@ interface RubroSeed {
   activo: boolean;
 }
 
-const BATCH = 50;
-
 async function main() {
-  console.log('🌱  VDAO — Seeding Rubros');
-  console.log(`📡  ${SUPABASE_URL}`);
+  console.log('VDAO — Seeding Rubros');
 
   const filePath = path.join(__dirname, '../src/config/rubros-seed.json');
   const rubros: RubroSeed[] = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  console.log(`📂  Found ${rubros.length} rubros`);
+  console.log(`Found ${rubros.length} rubros`);
 
-  // Verify connection
-  const { error: pingErr } = await supabase.from('rubros').select('count').limit(1);
-  if (pingErr) {
-    console.error('❌  Cannot connect. Make sure the DB schema is applied first.');
-    console.error('   ', pingErr.message);
-    process.exit(1);
-  }
+  const client = await pool.connect();
 
-  // Upsert rubros (without parent relations first)
-  const rows = rubros.map((r) => ({
-    id: r.id,
-    nombre: r.nombre,
-    nombre_en: r.nombre_en,
-    descripcion: r.descripcion,
-    activo: r.activo,
-    created_by: null,
-    validation_count: r.activo ? 3 : 0,
-  }));
+  try {
+    await client.query('BEGIN');
 
-  for (let i = 0; i < rows.length; i += BATCH) {
-    const batch = rows.slice(i, i + BATCH);
-    const { error } = await supabase
-      .from('rubros')
-      .upsert(batch, { onConflict: 'id', ignoreDuplicates: false });
-    if (error) { console.error(`❌  Batch ${i}:`, error.message); process.exit(1); }
-    console.log(`  ✅  Rubros ${i + 1}–${Math.min(i + BATCH, rows.length)} upserted`);
-  }
-
-  // Upsert parent relationships
-  const parents: { rubro_id: number; padre_id: number }[] = [];
-  for (const r of rubros) {
-    for (const p of r.padres) parents.push({ rubro_id: r.id, padre_id: p });
-  }
-
-  if (parents.length) {
-    console.log(`🔗  Inserting ${parents.length} parent relationships`);
-    for (let i = 0; i < parents.length; i += BATCH) {
-      const batch = parents.slice(i, i + BATCH);
-      const { error } = await supabase
-        .from('rubro_padres')
-        .upsert(batch, { onConflict: 'rubro_id,padre_id', ignoreDuplicates: true });
-      if (error) { console.error(`❌  Parents batch ${i}:`, error.message); process.exit(1); }
+    // Upsert rubros
+    for (const r of rubros) {
+      await client.query(
+        `INSERT INTO rubros (id, nombre, nombre_en, descripcion, activo, validation_count)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (id) DO UPDATE SET
+           nombre = EXCLUDED.nombre,
+           nombre_en = EXCLUDED.nombre_en,
+           descripcion = EXCLUDED.descripcion,
+           activo = EXCLUDED.activo,
+           validation_count = EXCLUDED.validation_count`,
+        [r.id, r.nombre, r.nombre_en, r.descripcion, r.activo, r.activo ? 3 : 0]
+      );
     }
-    console.log('  ✅  Parent relationships done');
+    console.log(`  Rubros upserted: ${rubros.length}`);
+
+    // Insert parent relationships
+    const parents: { rubro_id: number; padre_id: number }[] = [];
+    for (const r of rubros) {
+      for (const p of r.padres) parents.push({ rubro_id: r.id, padre_id: p });
+    }
+
+    for (const rel of parents) {
+      await client.query(
+        `INSERT INTO rubro_padres (rubro_id, padre_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+        [rel.rubro_id, rel.padre_id]
+      );
+    }
+    console.log(`  Parent relationships: ${parents.length}`);
+
+    await client.query('COMMIT');
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
   }
 
-  console.log('\n✨  Rubros seeded successfully!');
+  await pool.end();
+  console.log('Rubros seeded successfully!');
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

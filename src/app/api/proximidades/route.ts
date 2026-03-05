@@ -90,12 +90,12 @@ export async function POST(request: NextRequest) {
     if (uid) {
       await pool.query(
         `INSERT INTO proximidad_atestaciones_cache
-          (uid, rubro_a, rubro_b, score, proposer, proposer_level, timestamp)
+          (uid, rubro_a, rubro_b, score, proposer, proposer_level, created_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (uid) DO UPDATE SET
            score = EXCLUDED.score,
            proposer_level = EXCLUDED.proposer_level,
-           timestamp = EXCLUDED.timestamp`,
+           created_at = EXCLUDED.created_at`,
         [uid, ra, rb, score, proposer, level, new Date().toISOString()]
       );
     }

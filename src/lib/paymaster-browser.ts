@@ -9,7 +9,7 @@
 import { createSmartAccountClient } from 'permissionless';
 import { toSimpleSmartAccount } from 'permissionless/accounts';
 import { http, type WalletClient } from 'viem';
-import { sepolia } from "viem/chains";;
+import { sepolia } from "viem/chains";
 import {
   publicClient,
   ENTRYPOINT_V07,

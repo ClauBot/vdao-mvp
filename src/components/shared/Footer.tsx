@@ -31,12 +31,12 @@ export function Footer() {
             </a>
             <Separator orientation="vertical" className="h-3" />
             <a
-              href="https://sepolia.arbiscan.io"
+              href="https://sepolia.etherscan.io"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
-              Arbiscan
+              Etherscan
             </a>
           </nav>
 
