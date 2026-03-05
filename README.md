@@ -34,7 +34,7 @@ Sistema de reputación descentralizado donde individuos se evalúan mutuamente a
 - **Frontend:** Next.js 14 App Router + TypeScript + Tailwind CSS + shadcn/ui
 - **Wallet:** wagmi v2 + viem + WalletConnect
 - **Blockchain:** Sepolia testnet (EAS attestations)
-- **Gas:** Pimlico Paymaster (ERC-4337 / Account Abstraction) — gasless para usuarios
+- **Gas:** EAS Delegated Attestations — gasless para usuarios (server relayer paga gas)
 - **DB:** PostgreSQL (local con `pg`, compatible con Supabase para producción)
 
 ---
@@ -131,6 +131,9 @@ NEXT_PUBLIC_CHAIN_ID=11155111
 NEXT_PUBLIC_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
 
+# Gasless Relayer — private key of wallet that pays gas for delegated attestations
+RELAYER_PRIVATE_KEY=0x...
+
 # Legacy Supabase vars (needed for build, can be placeholder)
 NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
@@ -176,7 +179,7 @@ Tecnología, Artes, Mercadotecnia, Entretenimiento, Servicios Profesionales, Edu
 - **DAG no árbol:** Rubros pueden tener múltiples padres (ej: Ciencia Cognitiva → Psicología + IA + Ciencias)
 - **Proximidad Jaccard:** `|A∩B| / |A∪B|` + bonos por jerarquía
 - **Niveles 1-4:** Determinan permisos (crear rubros, validar, votar)
-- **Gasless:** Usuarios firman, paymaster paga gas vía ERC-4337
+- **Gasless:** Usuarios firman EIP-712 typed data, server relayer paga gas vía `attestByDelegation()`
 - **Privacidad NULL en MVP:** Todo público, privacidad en fase 2
 
 ---
@@ -193,7 +196,10 @@ src/
 │   └── api/
 │       ├── rubros/           # CRUD rubros
 │       ├── proximidades/     # Proximidades
-│       ├── atestaciones/     # Atestaciones EAS
+│       ├── atestaciones/     # Atestaciones EAS (indexing)
+│       ├── attest-delegated/ # Gasless delegated attestation relayer
+│       │   ├── route.ts      # POST: submit attestByDelegation, GET: health check
+│       │   └── nonce/route.ts # GET: fetch EAS nonce for address
 │       └── usuarios/         # Usuarios
 ├── components/
 │   ├── explorer/             # AttestationList, Card, Create, Summary
@@ -205,10 +211,12 @@ src/
 │   ├── db.ts                 # PostgreSQL pool (pg)
 │   ├── wagmi.ts              # wagmi v2 config (Sepolia)
 │   ├── eas.ts                # EAS SDK helpers
-│   ├── paymaster.ts          # Pimlico paymaster (server)
-│   └── paymaster-browser.ts  # Pimlico paymaster (client)
+│   ├── eas-delegated.ts      # EAS delegated attestation ABI + EIP-712 types
+│   ├── paymaster.ts          # Pimlico paymaster (legacy, deprecated)
+│   └── paymaster-browser.ts  # Pimlico paymaster (legacy, deprecated)
 └── scripts/
     ├── deploy-schemas-sepolia.ts  # Deploy EAS schemas
+    ├── test-delegated.ts          # Integration test: delegated attestation
     ├── seed-rubros.ts
     ├── seed-proximidades.ts
     └── seed-mock-attestations.ts
@@ -225,7 +233,7 @@ src/
 - [x] Fase 4: Integración y polish
 - [x] EAS Schemas desplegados en Sepolia
 - [x] Deploy Vercel (demo)
-- [ ] Paymaster funcional (Pimlico)
+- [x] Gasless attestations via EAS delegated attestations (reemplaza Pimlico ERC-4337)
 - [ ] Mobile-first UI
 - [ ] CAPTCHA anti-sybil (fase 2)
 - [ ] Migración a mainnet

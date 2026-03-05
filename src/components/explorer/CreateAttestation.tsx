@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
+import { useAccount, useWalletClient } from 'wagmi';
 import {
   Dialog,
   DialogContent,
@@ -14,21 +14,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-// Select components available for future use (currently using custom ScoreSelector)
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// supabase replaced with fetch
 import {
-  EAS_CONTRACT_ADDRESS,
   SCHEMA_EVALUATION_UID,
 } from '@/lib/eas';
-import { checkPaymasterAvailable } from '@/lib/paymaster';
+import {
+  EAS_EIP712_DOMAIN,
+  EAS_ATTEST_TYPES,
+} from '@/lib/eas-delegated';
 import { INTERACTION_TYPES, ROLE_LABELS, SCORE_LABELS, type Rubro } from '@/lib/types';
 import {
-  encodeFunctionData,
+  createPublicClient,
   encodeAbiParameters,
+  http,
   isAddress,
   type Address,
 } from 'viem';
+import { normalize } from 'viem/ens';
+import { mainnet } from 'viem/chains';
 import {
   Loader2,
   CheckCircle2,
@@ -38,36 +40,13 @@ import {
   Zap,
 } from 'lucide-react';
 
-// ── EAS attest() ABI ────────────────────────────────────────
-const EAS_ATTEST_ABI = [
-  {
-    inputs: [
-      {
-        components: [
-          { name: 'schema', type: 'bytes32' },
-          {
-            components: [
-              { name: 'recipient', type: 'address' },
-              { name: 'expirationTime', type: 'uint64' },
-              { name: 'revocable', type: 'bool' },
-              { name: 'refUID', type: 'bytes32' },
-              { name: 'data', type: 'bytes' },
-              { name: 'value', type: 'uint256' },
-            ],
-            name: 'data',
-            type: 'tuple',
-          },
-        ],
-        name: 'request',
-        type: 'tuple',
-      },
-    ],
-    name: 'attest',
-    outputs: [{ name: '', type: 'bytes32' }],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-] as const;
+// Mainnet client for ENS resolution
+const ensClient = createPublicClient({
+  chain: mainnet,
+  transport: http('https://eth.llamarpc.com'),
+});
+
+const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000' as const;
 
 // ── Schema encoder (no ethers.js dependency) ─────────────────
 function encodeEvaluationSchema(params: {
@@ -194,17 +173,19 @@ interface Props {
 export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
-  const publicClient = usePublicClient();
 
   const [open, setOpen] = useState(false);
-  const [paymasterAvailable, setPaymasterAvailable] = useState(false);
+  const [relayerAvailable, setRelayerAvailable] = useState(false);
   const [rubros, setRubros] = useState<Rubro[]>([]);
   const [rubroSearch, setRubroSearch] = useState('');
   const [loadingRubros, setLoadingRubros] = useState(false);
 
-  // Check paymaster availability on mount
+  // Check relayer availability on mount
   useEffect(() => {
-    checkPaymasterAvailable().then(setPaymasterAvailable);
+    fetch('/api/attest-delegated')
+      .then((res) => res.json())
+      .then((data) => setRelayerAvailable(data.available === true))
+      .catch(() => setRelayerAvailable(false));
   }, []);
 
   const [form, setForm] = useState<FormState>({
@@ -218,8 +199,11 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
 
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [txHash, setTxHash] = useState<string>('');
+  const [attestUid, setAttestUid] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [receiverError, setReceiverError] = useState<string>('');
+  const [ensName, setEnsName] = useState<string>('');
+  const [resolvingEns, setResolvingEns] = useState(false);
 
   // Fetch rubros when modal opens
   useEffect(() => {
@@ -238,6 +222,41 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
       .catch(() => setLoadingRubros(false));
   }, [open]);
 
+  // Resolve ENS when input looks like a .eth name
+  useEffect(() => {
+    const input = form.receiver.trim();
+    if (!input.endsWith('.eth')) {
+      setEnsName('');
+      return;
+    }
+
+    let cancelled = false;
+    setResolvingEns(true);
+    setReceiverError('');
+
+    ensClient
+      .getEnsAddress({ name: normalize(input) })
+      .then((resolved) => {
+        if (cancelled) return;
+        if (resolved) {
+          setEnsName(input);
+          setForm((f) => ({ ...f, receiver: resolved }));
+          setReceiverError('');
+        } else {
+          setReceiverError(`No se encontró dirección para ${input}`);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setReceiverError(`No se pudo resolver ${input}`);
+      })
+      .finally(() => {
+        if (!cancelled) setResolvingEns(false);
+      });
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.receiver.endsWith('.eth') ? form.receiver : '']);
+
   // Validate receiver address
   const validateReceiver = useCallback(
     (addr: string): boolean => {
@@ -246,7 +265,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
         return false;
       }
       if (!isAddress(addr)) {
-        setReceiverError('Dirección Ethereum inválida');
+        setReceiverError('Dirección Ethereum inválida o nombre ENS no encontrado');
         return false;
       }
       if (addr.toLowerCase() === address?.toLowerCase()) {
@@ -270,7 +289,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
       setErrorMsg('Selecciona un rubro');
       return;
     }
-    if (!walletClient || !publicClient) {
+    if (!walletClient) {
       setErrorMsg('Wallet no conectada');
       return;
     }
@@ -293,71 +312,45 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
         scoreService: form.scoreService,
         scoreTreatment: form.scoreTreatment,
         role: form.role,
-        counterpartUID:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
+        counterpartUID: ZERO_BYTES32,
       });
 
-      // 2. Encode the full attest() calldata
-      const calldata = encodeFunctionData({
-        abi: EAS_ATTEST_ABI,
-        functionName: 'attest',
-        args: [
-          {
-            schema: SCHEMA_EVALUATION_UID as `0x${string}`,
-            data: {
-              recipient: receiver,
-              expirationTime: 0n,
-              revocable: true,
-              refUID:
-                '0x0000000000000000000000000000000000000000000000000000000000000000',
-              data: schemaData,
-              value: 0n,
-            },
+      if (relayerAvailable) {
+        // ── Gasless path: EAS delegated attestation ──
+        // 2. Fetch nonce from EAS contract
+        const nonceRes = await fetch(`/api/attest-delegated/nonce?address=${address}`);
+        if (!nonceRes.ok) throw new Error('Failed to fetch nonce');
+        const { nonce } = await nonceRes.json();
+
+        // 3. Sign EIP-712 typed data (Legacy Attest struct)
+        const signature = await walletClient.signTypedData({
+          domain: {
+            ...EAS_EIP712_DOMAIN,
+            chainId: Number(EAS_EIP712_DOMAIN.chainId),
           },
-        ],
-      });
-
-      let hash: `0x${string}`;
-
-      // 3a. Gasless path (if Pimlico configured)
-      if (paymasterAvailable) {
-        // Dynamic import to avoid issues when Pimlico is not configured
-        const { createGaslessClientFromWalletClient } = await import(
-          '@/lib/paymaster-browser'
-        );
-        const { smartAccountClient } = await createGaslessClientFromWalletClient(walletClient);
-        hash = await smartAccountClient.sendTransaction({
-          to: EAS_CONTRACT_ADDRESS as Address,
-          data: calldata,
-          value: 0n,
+          types: EAS_ATTEST_TYPES,
+          primaryType: 'Attest',
+          message: {
+            schema: SCHEMA_EVALUATION_UID as `0x${string}`,
+            recipient: receiver,
+            expirationTime: 0n,
+            revocable: true,
+            refUID: ZERO_BYTES32,
+            data: schemaData,
+            nonce: BigInt(nonce),
+          },
         });
-      } else {
-        // 3b. Direct path
-        hash = await walletClient.sendTransaction({
-          to: EAS_CONTRACT_ADDRESS as Address,
-          data: calldata,
-          value: 0n,
-        });
-      }
 
-      // 4. Wait for receipt
-      const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
-      if (receipt.status !== 'success') {
-        throw new Error('La transacción fue revertida');
-      }
-
-      setTxHash(hash);
-
-      // 5. Index in Supabase via API route
-      try {
-        await fetch('/api/atestaciones', {
+        // 4. Submit to relayer
+        const res = await fetch('/api/attest-delegated', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            txHash: hash,
+            signature,
             attester: address,
-            receiver: form.receiver,
+            recipient: receiver,
+            schemaUid: SCHEMA_EVALUATION_UID,
+            schemaData,
             rubroId: parseInt(form.rubroId),
             interactionType: form.interactionType,
             scoreService: form.scoreService,
@@ -365,9 +358,89 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
             role: form.role,
           }),
         });
-      } catch (indexErr) {
-        // Indexing failure is non-critical
-        console.warn('Indexing failed (non-critical):', indexErr);
+
+        const result = await res.json();
+        if (!res.ok) {
+          throw new Error(result.error || result.details || 'Attestation failed');
+        }
+
+        setTxHash(result.txHash);
+        if (result.uid) setAttestUid(result.uid);
+      } else {
+        // ── Direct path: user pays gas ──
+        const { encodeFunctionData } = await import('viem');
+
+        const EAS_ATTEST_ABI = [{
+          inputs: [{
+            components: [
+              { name: 'schema', type: 'bytes32' },
+              {
+                components: [
+                  { name: 'recipient', type: 'address' },
+                  { name: 'expirationTime', type: 'uint64' },
+                  { name: 'revocable', type: 'bool' },
+                  { name: 'refUID', type: 'bytes32' },
+                  { name: 'data', type: 'bytes' },
+                  { name: 'value', type: 'uint256' },
+                ],
+                name: 'data',
+                type: 'tuple',
+              },
+            ],
+            name: 'request',
+            type: 'tuple',
+          }],
+          name: 'attest',
+          outputs: [{ name: '', type: 'bytes32' }],
+          stateMutability: 'payable',
+          type: 'function',
+        }] as const;
+
+        const { EAS_CONTRACT_ADDRESS } = await import('@/lib/eas');
+
+        const calldata = encodeFunctionData({
+          abi: EAS_ATTEST_ABI,
+          functionName: 'attest',
+          args: [{
+            schema: SCHEMA_EVALUATION_UID as `0x${string}`,
+            data: {
+              recipient: receiver,
+              expirationTime: 0n,
+              revocable: true,
+              refUID: ZERO_BYTES32,
+              data: schemaData,
+              value: 0n,
+            },
+          }],
+        });
+
+        const hash = await walletClient.sendTransaction({
+          to: EAS_CONTRACT_ADDRESS as Address,
+          data: calldata,
+          value: 0n,
+        });
+
+        setTxHash(hash);
+
+        // Index in DB
+        try {
+          await fetch('/api/atestaciones', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              txHash: hash,
+              attester: address,
+              receiver: form.receiver,
+              rubroId: parseInt(form.rubroId),
+              interactionType: form.interactionType,
+              scoreService: form.scoreService,
+              scoreTreatment: form.scoreTreatment,
+              role: form.role,
+            }),
+          });
+        } catch (indexErr) {
+          console.warn('Indexing failed (non-critical):', indexErr);
+        }
       }
 
       setSubmitState('success');
@@ -397,6 +470,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
       });
       setSubmitState('idle');
       setTxHash('');
+      setAttestUid('');
       setErrorMsg('');
       setReceiverError('');
       setRubroSearch('');
@@ -416,7 +490,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
       <Button onClick={() => setOpen(true)} className="gap-2">
         <Star className="h-4 w-4" />
         Evaluar
-        {paymasterAvailable && (
+        {relayerAvailable && (
           <span className="ml-0.5">
             <Zap className="h-3 w-3 text-yellow-400" />
           </span>
@@ -436,7 +510,7 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
                 </DialogDescription>
               </div>
               <a
-                href={`https://sepolia.easscan.org/tx/${txHash}`}
+                href={attestUid ? `https://sepolia.easscan.org/attestation/view/${attestUid}` : `https://sepolia.etherscan.io/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline"
@@ -453,9 +527,9 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   Crear Atestación
-                  {paymasterAvailable && (
+                  {relayerAvailable && (
                     <Badge variant="secondary" className="gap-1 text-xs">
-                      <Zap className="h-3 w-3 text-yellow-500" /> Sin gas
+                      <Zap className="h-3 w-3 text-yellow-500" /> Gasless
                     </Badge>
                   )}
                 </DialogTitle>
@@ -468,18 +542,32 @@ export function CreateAttestation({ prefillReceiver, onSuccess }: Props) {
                 {/* Receiver address */}
                 <div className="space-y-2">
                   <Label htmlFor="receiver">Dirección del evaluado</Label>
-                  <Input
-                    id="receiver"
-                    placeholder="0x..."
-                    value={form.receiver}
-                    onChange={(e) => {
-                      setForm((f) => ({ ...f, receiver: e.target.value }));
-                      if (receiverError) validateReceiver(e.target.value);
-                    }}
-                    onBlur={() => validateReceiver(form.receiver)}
-                    className={receiverError ? 'border-red-500' : ''}
-                    disabled={submitState === 'submitting'}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="receiver"
+                      placeholder="0x... o nombre.eth"
+                      value={ensName || form.receiver}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEnsName('');
+                        setForm((f) => ({ ...f, receiver: val }));
+                        if (receiverError && !val.endsWith('.eth')) validateReceiver(val);
+                      }}
+                      onBlur={() => {
+                        if (!form.receiver.endsWith('.eth')) validateReceiver(form.receiver);
+                      }}
+                      className={receiverError ? 'border-red-500' : ''}
+                      disabled={submitState === 'submitting' || resolvingEns}
+                    />
+                    {resolvingEns && (
+                      <Loader2 className="absolute right-3 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                  {ensName && isAddress(form.receiver) && (
+                    <p className="text-xs text-green-600 dark:text-green-400">
+                      {ensName} → {form.receiver.slice(0, 6)}...{form.receiver.slice(-4)}
+                    </p>
+                  )}
                   {receiverError && (
                     <p className="text-xs text-red-500">{receiverError}</p>
                   )}
