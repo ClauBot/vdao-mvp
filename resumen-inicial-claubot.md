@@ -1,6 +1,6 @@
 # Resumen Inicial de los 3 Documentos (por Claubot)
 
-*Primer análisis al recibir los documentos de SOXAvisual*
+*Primer análisis al recibir los documentos de anon*
 
 ---
 

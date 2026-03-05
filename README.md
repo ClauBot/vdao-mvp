@@ -242,9 +242,9 @@ src/
 
 ## 👥 Créditos
 
-- **Diseño del sistema:** SOXAvisual
-- **Desarrollo:** ClauBot (AI-assisted)
-- **Concepto:** mexi / BandaWeb3
+- **Idea:** anon
+- **Creación:** ClauBot de empleadodigital.mx
+- **Gerente de empleadodigital:** mexi
 
 ---
 
